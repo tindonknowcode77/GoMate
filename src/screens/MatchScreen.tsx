@@ -1,3 +1,4 @@
+import { Text } from '../components/LocalizedText';
 import { useCallback, useMemo, useState } from 'react';
 import {
   Animated,
@@ -5,7 +6,6 @@ import {
   PanResponder,
   Pressable,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';

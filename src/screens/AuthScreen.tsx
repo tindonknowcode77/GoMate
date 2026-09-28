@@ -1,3 +1,4 @@
+import { Text } from '../components/LocalizedText';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -5,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BrandLogo } from '../components/BrandLogo';
 import { FormField } from '../components/FormField';
 import { GradientButton } from '../components/GradientButton';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { colors, layout } from '../theme';
 
 type AuthMode = 'login' | 'register';
@@ -52,6 +53,7 @@ export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.page}>
+            <View style={styles.languageRow}><LanguageSwitcher /></View>
             <View style={styles.brandArea}>
               <BrandLogo />
               <View style={styles.promisePill}>
@@ -195,6 +197,7 @@ const styles = StyleSheet.create({
   blueGlow: { backgroundColor: 'rgba(45,143,245,0.09)', borderRadius: 115, bottom: 10, height: 230, left: -145, position: 'absolute', width: 230 },
   scrollContent: { flexGrow: 1, paddingBottom: 24 },
   page: { alignSelf: 'center', maxWidth: layout.maxWidth, paddingHorizontal: 18, width: '100%' },
+  languageRow: { alignItems: 'flex-end', marginTop: 8 },
   brandArea: { alignItems: 'center', paddingBottom: 25, paddingTop: 28 },
   promisePill: { alignItems: 'center', backgroundColor: '#F0EEFF', borderRadius: 15, flexDirection: 'row', gap: 6, marginTop: 2, paddingHorizontal: 12, paddingVertical: 7 },
   promiseText: { color: '#6258EC', fontSize: 11, fontWeight: '700' },

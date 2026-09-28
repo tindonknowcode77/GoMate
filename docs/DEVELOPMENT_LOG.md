@@ -3,6 +3,38 @@
 This file records completed development work. Keep the newest entry at the top
 and follow `templates/development-log-entry.md`.
 
+## 2026-09-28 - Add Vietnamese and English language switching
+
+### Summary
+
+- Added an app-level Vietnamese/English language provider and shared localized
+  text rendering so one selection updates the complete app flow.
+- Added compact VI/EN controls to authentication, profile onboarding, and the
+  main Profile tab, and localized form placeholders and sample activity data.
+- Kept filter and form state independent from translated display labels so
+  switching languages does not reset a user's current work.
+
+### Files changed
+
+- `App.tsx`
+- `src/i18n/LanguageContext.tsx`
+- `src/components/LanguageSwitcher.tsx`, `src/components/LocalizedText.tsx`
+- Shared text components and all screens under `src/components/` and
+  `src/screens/`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm.cmd run typecheck`: Passed.
+- `npm.cmd run lint`: Passed.
+- `npx.cmd expo-doctor`: Passed all 21 checks.
+- `npx.cmd expo export --platform android --output-dir dist`: Passed.
+
+### Remaining work
+
+- The selected language is kept for the current app session; persistence across
+  a full app restart can be added when application settings storage is introduced.
+
 ## 2026-09-28 - Make activity discovery edge-to-edge
 
 ### Summary

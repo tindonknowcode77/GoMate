@@ -1,5 +1,6 @@
+import { Text } from '../components/LocalizedText';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { Conversation } from './MessagesScreen';
 import { colors, layout } from '../theme';
+import { useLanguage } from '../i18n/LanguageContext';
 
 type ChatScreenProps = {
   conversation: Conversation;
@@ -14,6 +16,7 @@ type ChatScreenProps = {
 };
 
 export function ChatScreen({ conversation, onBack }: ChatScreenProps) {
+  const { translate } = useLanguage();
   const [message, setMessage] = useState('');
   const [sentMessages, setSentMessages] = useState<string[]>([]);
   const send = () => {
@@ -38,7 +41,7 @@ export function ChatScreen({ conversation, onBack }: ChatScreenProps) {
         </ScrollView>
         <View style={styles.composer}>
           <Pressable style={styles.addButton}><Ionicons color="#69748A" name="add" size={23} /></Pressable>
-          <TextInput multiline onChangeText={setMessage} placeholder="Nhập tin nhắn..." placeholderTextColor="#9DA5B7" style={styles.input} value={message} />
+          <TextInput multiline onChangeText={setMessage} placeholder={translate('Nhập tin nhắn...')} placeholderTextColor="#9DA5B7" style={styles.input} value={message} />
           <Pressable onPress={send}>
             <LinearGradient colors={['#7449FA', '#3489F4']} style={styles.sendButton}>
               <Ionicons color="#FFFFFF" name="send" size={18} />

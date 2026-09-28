@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { LanguageProvider } from './src/i18n/LanguageContext';
 import { AuthScreen } from './src/screens/AuthScreen';
 import { MainApp } from './src/screens/MainApp';
 import { ProfileScreen } from './src/screens/ProfileScreen';
@@ -13,20 +14,22 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
-      {screen === 'auth' && (
-        <AuthScreen
-          onLogin={() => setScreen('main')}
-          onRegister={() => setScreen('profile')}
-        />
-      )}
-      {screen === 'profile' && (
-        <ProfileScreen
-          onFinish={() => setScreen('main')}
-          onSkip={() => setScreen('main')}
-        />
-      )}
-      {screen === 'main' && <MainApp />}
+      <LanguageProvider>
+        <StatusBar style="dark" />
+        {screen === 'auth' && (
+          <AuthScreen
+            onLogin={() => setScreen('main')}
+            onRegister={() => setScreen('profile')}
+          />
+        )}
+        {screen === 'profile' && (
+          <ProfileScreen
+            onFinish={() => setScreen('main')}
+            onSkip={() => setScreen('main')}
+          />
+        )}
+        {screen === 'main' && <MainApp />}
+      </LanguageProvider>
     </SafeAreaProvider>
   );
 }

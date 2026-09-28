@@ -1,5 +1,6 @@
+import { Text } from './LocalizedText';
+import { Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type GradientButtonProps = {

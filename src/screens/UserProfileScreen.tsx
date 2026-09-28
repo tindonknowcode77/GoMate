@@ -1,8 +1,10 @@
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Text } from '../components/LocalizedText';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { colors, layout } from '../theme';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 const avatar = require('../assets/profile-avatar.png');
 
@@ -18,7 +20,10 @@ export function UserProfileScreen({ onEdit, onMyActivities, onNotifications }: U
       <View style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Hồ sơ</Text>
-          <Pressable style={styles.settingsButton}><Ionicons color={colors.ink} name="settings-outline" size={22} /></Pressable>
+          <View style={styles.headerActions}>
+            <LanguageSwitcher />
+            <Pressable style={styles.settingsButton}><Ionicons color={colors.ink} name="settings-outline" size={22} /></Pressable>
+          </View>
         </View>
         <LinearGradient colors={['#7547FA', '#3C84F4']} style={styles.cover}>
           <View style={styles.coverGlow} />
@@ -77,6 +82,7 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 27 },
   page: { alignSelf: 'center', maxWidth: layout.maxWidth, paddingHorizontal: 18, width: '100%' },
   header: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 14, paddingTop: 20 },
+  headerActions: { alignItems: 'center', flexDirection: 'row', gap: 8 },
   headerTitle: { color: colors.ink, fontSize: 27, fontWeight: '900' },
   settingsButton: { alignItems: 'center', backgroundColor: '#F4F5F9', borderRadius: 17, height: 42, justifyContent: 'center', width: 42 },
   cover: { borderRadius: 25, height: 126, overflow: 'hidden' },

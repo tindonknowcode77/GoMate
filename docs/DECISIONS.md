@@ -4,6 +4,19 @@ Record decisions here when they materially affect architecture, dependencies,
 security, the data model, or product behavior. Keep the newest decision at the
 top. Small implementation details belong only in `DEVELOPMENT_LOG.md`.
 
+### 2026-09-28 - Centralize display-language state and translation
+
+- **Status:** Accepted
+- **Context:** GoMate needs to switch between Vietnamese and English without
+  resetting navigation, filters, or in-progress form values.
+- **Decision:** Keep the selected locale in a provider above the complete app
+  flow, translate display text through a shared text component, and translate
+  non-text props such as placeholders at their reusable component boundary.
+- **Consequences:** All screens update immediately from one setting without a
+  new runtime dependency. Translation entries remain centralized, while locale
+  persistence is deferred until app settings storage is introduced.
+- **Supersedes:** None.
+
 ### 2026-09-28 - Separate Match management from full-screen discovery
 
 - **Status:** Accepted

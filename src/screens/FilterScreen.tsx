@@ -1,5 +1,6 @@
+import { Text } from '../components/LocalizedText';
+import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { ComponentProps, ReactNode, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';

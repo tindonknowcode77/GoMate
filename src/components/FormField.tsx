@@ -1,8 +1,10 @@
+import { Text } from './LocalizedText';
+import { StyleSheet, TextInput, View } from 'react-native';
 import { ComponentProps } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '../theme';
+import { useLanguage } from '../i18n/LanguageContext';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -31,6 +33,7 @@ export function FormField({
   rightIcon,
   onRightPress,
 }: FormFieldProps) {
+  const { translate } = useLanguage();
   return (
     <View style={styles.group}>
       <Text style={styles.label}>{label}</Text>
@@ -41,7 +44,7 @@ export function FormField({
           keyboardType={keyboardType}
           multiline={multiline}
           onChangeText={onChangeText}
-          placeholder={placeholder}
+          placeholder={placeholder ? translate(placeholder) : undefined}
           placeholderTextColor="#A4ADC0"
           secureTextEntry={secureTextEntry}
           style={[styles.input, multiline && styles.multilineInput]}

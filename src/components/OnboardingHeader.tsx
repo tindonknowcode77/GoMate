@@ -1,8 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Text } from './LocalizedText';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { colors, layout } from '../theme';
 import { BrandLogo } from './BrandLogo';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 type OnboardingHeaderProps = {
   step: number;
@@ -16,7 +18,7 @@ export function OnboardingHeader({ step, totalSteps = 2, onSkip }: OnboardingHea
   return (
     <View style={styles.header}>
       <View style={styles.topRow}>
-        <View style={styles.skipSpacer} />
+        <LanguageSwitcher />
         <BrandLogo compact />
         <Pressable accessibilityRole="button" onPress={onSkip} style={styles.skipButton}>
           <Text style={styles.skip}>Skip</Text>
@@ -30,7 +32,7 @@ export function OnboardingHeader({ step, totalSteps = 2, onSkip }: OnboardingHea
           style={[styles.activeProgress, { width: progress }]}
         />
       </View>
-      <Text style={styles.stepText}>{step} of {totalSteps}</Text>
+      <Text style={styles.stepText}>{step}<Text> of </Text>{totalSteps}</Text>
     </View>
   );
 }
@@ -46,9 +48,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  skipSpacer: {
-    width: 52,
   },
   skipButton: {
     alignItems: 'flex-end',

@@ -1,3 +1,4 @@
+import { Text } from '../components/LocalizedText';
 import { ComponentProps, useState } from 'react';
 import {
   Image,
@@ -6,7 +7,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   useWindowDimensions,
   View,
@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GradientButton } from '../components/GradientButton';
 import { OnboardingHeader } from '../components/OnboardingHeader';
 import { colors, layout } from '../theme';
+import { useLanguage } from '../i18n/LanguageContext';
 
 const defaultAvatar = require('../assets/profile-avatar.png');
 
@@ -39,10 +40,13 @@ type ProfileScreenProps = {
 };
 
 export function ProfileScreen({ onFinish, onSkip }: ProfileScreenProps) {
+  const { language, translate } = useLanguage();
   const { width } = useWindowDimensions();
   const [name, setName] = useState('Minh Phan');
   const [age, setAge] = useState(22);
-  const [bio, setBio] = useState('Coffee, badminton and spontaneous trips ✈️');
+  const [bio, setBio] = useState(language === 'vi'
+    ? 'Coffee, cầu lông và những chuyến đi ngẫu hứng ✈️'
+    : 'Coffee, badminton, and spontaneous trips ✈️');
   const [region, setRegion] = useState(regions[0]);
   const [selectedInterests, setSelectedInterests] = useState<Set<string>>(
     () => new Set(['Coffee', 'Travel']),
@@ -159,7 +163,7 @@ export function ProfileScreen({ onFinish, onSkip }: ProfileScreenProps) {
                   maxLength={80}
                   multiline
                   onChangeText={setBio}
-                  placeholder="A quick line about you"
+                  placeholder={translate('A quick line about you')}
                   placeholderTextColor="#A5AEC0"
                   style={styles.bioInput}
                   value={bio}
