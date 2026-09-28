@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useLanguage } from '../i18n/LanguageContext';
+import { colors } from '../theme';
 
 export function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
@@ -22,9 +23,9 @@ export function LanguageSwitcher() {
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: '#EEF0F5', borderRadius: 14, flexDirection: 'row', padding: 3 },
+  container: { backgroundColor: colors.surfaceStrong, borderRadius: 14, flexDirection: 'row', padding: 3 },
   option: { alignItems: 'center', borderRadius: 11, minWidth: 34, paddingHorizontal: 8, paddingVertical: 7 },
-  activeOption: { backgroundColor: '#FFFFFF', shadowColor: '#20355A', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 2 },
-  label: { color: '#7D879B', fontSize: 10, fontWeight: '800' },
-  activeLabel: { color: '#5E5CEB' },
+  activeOption: { backgroundColor: colors.white, shadowColor: colors.text, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 5, elevation: 2 },
+  label: { color: colors.textMuted, fontSize: 10, fontWeight: '800' },
+  activeLabel: { color: colors.primary },
 });

@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormField } from '../components/FormField';
 import { GradientButton } from '../components/GradientButton';
 import { ScreenHeader } from '../components/ScreenHeader';
-import { layout } from '../theme';
+import { colors, layout } from '../theme';
 
 const avatar = require('../assets/profile-avatar.png');
 const interests = ['Coffee', 'Travel', 'Running', 'Concert', 'Food'];
@@ -24,7 +24,7 @@ export function EditProfileScreen({ onBack, onSaved }: { onBack: () => void; onS
         <View style={styles.page}>
           <View style={styles.avatarArea}>
             <Image source={avatar} style={styles.avatar} />
-            <Pressable style={styles.changePhoto}><Ionicons color="#FFFFFF" name="camera" size={17} /></Pressable>
+            <Pressable style={styles.changePhoto}><Ionicons color={colors.white} name="camera" size={17} /></Pressable>
             <Text style={styles.changeText}>Thay ảnh đại diện</Text>
           </View>
           <View style={styles.card}>
@@ -49,19 +49,19 @@ export function EditProfileScreen({ onBack, onSaved }: { onBack: () => void; onS
 }
 
 const styles = StyleSheet.create({
-  safeArea: { backgroundColor: '#F8F9FC', flex: 1 },
+  safeArea: { backgroundColor: colors.background, flex: 1 },
   scrollContent: { paddingBottom: 26 },
   page: { alignSelf: 'center', maxWidth: layout.maxWidth, padding: 18, width: '100%' },
   avatarArea: { alignItems: 'center', marginVertical: 8 },
   avatar: { borderRadius: 43, height: 86, width: 86 },
-  changePhoto: { alignItems: 'center', backgroundColor: '#5E5CEB', borderColor: '#FFFFFF', borderRadius: 15, borderWidth: 2, bottom: 19, height: 30, justifyContent: 'center', marginBottom: -16, marginLeft: 61, width: 30 },
-  changeText: { color: '#5E5CEB', fontSize: 11, fontWeight: '700', marginTop: 5 },
-  card: { backgroundColor: '#FFFFFF', borderColor: '#E8EBF2', borderRadius: 24, borderWidth: 1, gap: 15, marginTop: 14, padding: 17 },
-  interestLabel: { color: '#53617D', fontSize: 15, fontWeight: '600', marginBottom: 9 },
+  changePhoto: { alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.white, borderRadius: 15, borderWidth: 2, bottom: 19, height: 30, justifyContent: 'center', marginBottom: -16, marginLeft: 61, width: 30 },
+  changeText: { color: colors.primary, fontSize: 11, fontWeight: '700', marginTop: 5 },
+  card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 24, borderWidth: 1, gap: 15, marginTop: 14, padding: 17 },
+  interestLabel: { color: colors.textSecondary, fontSize: 15, fontWeight: '600', marginBottom: 9 },
   interestRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  interest: { backgroundColor: '#F5F6F9', borderColor: '#E7E9EF', borderRadius: 14, borderWidth: 1, paddingHorizontal: 11, paddingVertical: 8 },
-  activeInterest: { backgroundColor: '#EFEDFF', borderColor: '#6E60EF' },
-  interestText: { color: '#68738A', fontSize: 11, fontWeight: '600' },
-  activeInterestText: { color: '#5E57E8', fontWeight: '800' },
+  interest: { backgroundColor: colors.surfaceMuted, borderColor: colors.border, borderRadius: 14, borderWidth: 1, paddingHorizontal: 11, paddingVertical: 8 },
+  activeInterest: { backgroundColor: colors.primarySoft, borderColor: colors.primary },
+  interestText: { color: colors.textSecondary, fontSize: 11, fontWeight: '600' },
+  activeInterestText: { color: colors.primary, fontWeight: '800' },
   saveButton: { marginTop: 17 },
 });

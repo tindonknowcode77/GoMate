@@ -11,6 +11,12 @@ export type Activity = {
   category: string;
   tags: string[];
   description: string;
+  estimatedCost: string;
+  requirements: string[];
+  plan: string[];
+  hostRating: number;
+  hostCompletedActivities: number;
+  status?: 'pending' | 'confirmed' | 'in-progress' | 'completed';
   image: ImageSourcePropType;
 };
 
@@ -26,6 +32,12 @@ export const activities: Activity[] = [
     category: 'Ăn uống',
     tags: ['Coffee', 'Trò chuyện'],
     description: 'Khám phá một quán cà phê yên tĩnh và làm quen với những người bạn mới.',
+    estimatedCost: '120.000đ/người',
+    requirements: ['Đến đúng giờ', 'Tôn trọng không gian chung'],
+    plan: ['09:00 Gặp tại quán', '09:15 Làm quen', '10:30 Chụp ảnh nhóm'],
+    hostRating: 4.9,
+    hostCompletedActivities: 18,
+    status: 'confirmed',
     image: require('../assets/Activity-image/cafe.jpg'),
   },
   {
@@ -39,6 +51,12 @@ export const activities: Activity[] = [
     category: 'Thể thao',
     tags: ['Cầu lông', 'Năng động'],
     description: 'Một buổi đánh đôi nhẹ nhàng, phù hợp cả với người mới bắt đầu.',
+    estimatedCost: '90.000đ/người',
+    requirements: ['Mang giày thể thao', 'Có mặt trước 15 phút'],
+    plan: ['18:45 Khởi động', '19:00 Chia cặp', '20:30 Tổng kết'],
+    hostRating: 4.8,
+    hostCompletedActivities: 24,
+    status: 'pending',
     image: require('../assets/Activity-image/caulong.jpg'),
   },
   {
@@ -52,6 +70,12 @@ export const activities: Activity[] = [
     category: 'Du lịch',
     tags: ['Đà Lạt', 'Thiên nhiên'],
     description: 'Đón bình minh giữa biển mây và ghi lại một buổi sáng thật đáng nhớ.',
+    estimatedCost: '650.000đ/người',
+    requirements: ['Thể lực cơ bản', 'Mang áo ấm và giày bám tốt'],
+    plan: ['04:30 Tập trung', '05:00 Di chuyển', '06:00 Ngắm bình minh'],
+    hostRating: 4.9,
+    hostCompletedActivities: 12,
+    status: 'confirmed',
     image: require('../assets/Activity-image/dalat-travel.jpeg'),
   },
   {
@@ -65,6 +89,12 @@ export const activities: Activity[] = [
     category: 'Thể thao',
     tags: ['Pickleball', 'Giao lưu'],
     description: 'Chơi vài trận vui vẻ, vận động nhẹ và kết nối thêm đồng đội mới.',
+    estimatedCost: '110.000đ/người',
+    requirements: ['Trang phục thể thao', 'Người mới được chào đón'],
+    plan: ['18:30 Check-in', '18:45 Làm nóng', '19:00 Bắt đầu trận'],
+    hostRating: 4.7,
+    hostCompletedActivities: 9,
+    status: 'in-progress',
     image: require('../assets/Activity-image/pickerball.jpg'),
   },
 ];

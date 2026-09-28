@@ -7,8 +7,25 @@ export type PersonProfile = {
   bio: string;
   interests: string[];
   activitiesJoined: number;
+  rating: number;
+  attendanceRate: number;
   verified?: boolean;
   role?: 'host' | 'member';
+};
+
+export const currentUserProfile: PersonProfile = {
+  id: 'current-user',
+  name: 'Minh',
+  initial: 'M',
+  age: 22,
+  location: 'TP.HCM',
+  bio: 'Thích khám phá những quán cà phê mới, chơi thể thao và đi du lịch. Luôn sẵn sàng kết nối với những người bạn mới có cùng sở thích!',
+  interests: ['Cà phê', 'Du lịch', 'Thể thao', 'Ẩm thực', 'Gaming', 'Chụp ảnh'],
+  activitiesJoined: 12,
+  rating: 4.8,
+  attendanceRate: 96,
+  verified: true,
+  role: 'member',
 };
 
 export const communityMembers: PersonProfile[] = [
@@ -21,6 +38,8 @@ export const communityMembers: PersonProfile[] = [
     bio: 'Thích du lịch, nhiếp ảnh và những buổi cà phê cuối tuần.',
     interests: ['Du lịch', 'Nhiếp ảnh', 'Coffee'],
     activitiesJoined: 9,
+    rating: 4.9,
+    attendanceRate: 98,
     verified: true,
     role: 'member',
   },
@@ -33,6 +52,8 @@ export const communityMembers: PersonProfile[] = [
     bio: 'Runner, coffee lover và luôn sẵn sàng thử một môn thể thao mới.',
     interests: ['Running', 'Coffee', 'Thể thao'],
     activitiesJoined: 15,
+    rating: 4.8,
+    attendanceRate: 96,
     verified: true,
     role: 'member',
   },
@@ -45,6 +66,8 @@ export const communityMembers: PersonProfile[] = [
     bio: 'Tìm những người bạn tích cực để cùng khám phá thành phố.',
     interests: ['Ẩm thực', 'Board game', 'Concert'],
     activitiesJoined: 12,
+    rating: 4.7,
+    attendanceRate: 92,
     role: 'member',
   },
 ];
@@ -59,6 +82,8 @@ export function createHostProfile(name: string): PersonProfile {
     bio: 'Host yêu thích việc tạo ra những hoạt động an toàn và kết nối mọi người.',
     interests: ['Kết nối', 'Du lịch', 'Thể thao'],
     activitiesJoined: 18,
+    rating: 4.9,
+    attendanceRate: 99,
     verified: true,
     role: 'host',
   };

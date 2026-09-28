@@ -4,6 +4,117 @@ Record decisions here when they materially affect architecture, dependencies,
 security, the data model, or product behavior. Keep the newest decision at the
 top. Small implementation details belong only in `DEVELOPMENT_LOG.md`.
 
+### 2026-09-29 - Keep Match discovery separate from its management hub
+
+- **Status:** Accepted
+- **Context:** The Match swipe experience is already the approved discovery
+  surface, while the former "Hoạt động của bạn" page needs to provide concise
+  access to requests, hosted activities, and the user's public identity.
+- **Decision:** Preserve the existing Match screen and use the underlying Match
+  hub only for launching discovery, managing the two request types, and opening
+  a reusable own-profile public preview.
+- **Consequences:** Discovery gestures and filters remain stable. The hub stays
+  visually focused and does not duplicate activity lists, recommendations,
+  category browsing, or tutorial content.
+- **Supersedes:** None.
+
+### 2026-09-29 - Separate activity management from discovery
+
+- **Status:** Accepted
+- **Context:** Home previously promoted Match and rendered recommended activity
+  cards, which duplicated discovery and weakened the role of the Match tab.
+- **Decision:** Home only manages activities the user joins or hosts, including
+  their next activity, actionable updates, schedule, and history. Match is the
+  only surface for discovering new activities; Create, Messages, and Profile
+  retain their existing creation, communication, and identity responsibilities.
+- **Consequences:** Home contains no recommendations, nearby activity search,
+  categories, or swipe discovery. Its empty state links directly to Match.
+
+### 2026-09-29 - Make Match a single-activity decision flow
+
+- **Status:** Accepted
+- **Context:** The previous dark swipe deck treated details as a separate route
+  and exposed three competing actions, while the approved Match design requires
+  focused evaluation of one activity at a time.
+- **Decision:** Match renders one light activity card with details in the same
+  vertical scroll. Skip and Interested are the only primary actions; filter,
+  undo, report, hide, and safety are secondary controls or sheets.
+- **Consequences:** Match no longer routes to Activity Detail for basic reading.
+  Existing detail routes remain available from Home and activity-management
+  flows. Preference/report persistence still depends on future services.
+
+### 2026-09-29 - Separate notification inbox content from notification preferences
+
+- **Status:** Accepted
+- **Context:** GoMate needs both a user-facing notification history and controls
+  for choosing which notification categories are delivered.
+- **Decision:** Keep the notification inbox as a full-screen route from Home and
+  Profile, while making notification preferences a nested Settings screen.
+- **Consequences:** Users can review activity updates without conflating them
+  with delivery controls. The preference toggles remain local until persistence
+  APIs are connected.
+
+### 2026-09-29 - Keep password recovery as a navigable UI prototype
+
+- **Status:** Accepted
+- **Context:** The supplied reference defines the full password-reset journey,
+  but the current frontend has no connected authentication or email API.
+- **Decision:** Make every recovery state navigable in the client so the design
+  and interaction flow can be reviewed now, without simulating a real email or
+  password update.
+- **Consequences:** The screens and transitions are complete for UI review;
+  production use still requires backend validation, secure token handling, and
+  error/loading states.
+
+### 2026-09-29 - Keep onboarding product-focused
+
+- **Status:** Accepted
+- **Context:** The Figma onboarding section includes Suggested Communities and
+  Suggested People, while GoMate's agreed product scope excludes communities,
+  followers, and generic social discovery.
+- **Decision:** Implement the Figma onboarding presentation and all relevant
+  setup steps, but omit the two social suggestion screens. Continue from
+  Interests to Notifications, Location, and the completion screen.
+- **Consequences:** The onboarding remains visually complete and leads directly
+  into GoMate's activity workflow without introducing unsupported social
+  concepts. Native permission requests remain behind a service-integration TODO.
+- **Supersedes:** None.
+
+### 2026-09-29 - Treat Figma as the visual source of truth
+
+- **Status:** Accepted
+- **Context:** The existing React Native screens carried a legacy visual system
+  that did not match the supplied GoMate UI2 Figma file. Keeping their layouts
+  and only changing colors made the product still read as the old frontend.
+- **Decision:** Preserve useful navigation, state, types, services, and product
+  logic, but replace visual layouts using the Figma typography, spacing,
+  controls, image treatment, cards, headers, and navigation patterns. Keep the
+  GoMate activity lifecycle as the functional source of truth and do not add
+  Figma's unrelated community, social-feed, or follower features. All product
+  colors and semantic surfaces must come from the centralized theme.
+- **Consequences:** Existing screens may be structurally rewritten even when
+  their callbacks remain unchanged. Figma establishes presentation; GoMate's
+  Activity → Match → Request → Group → Activity → Rating flow establishes
+  behavior.
+- **Supersedes:** The legacy screen layouts as implementation references.
+
+### 2026-09-29 - Make the activity lifecycle the product architecture
+
+- **Status:** Accepted
+- **Context:** The inherited template included social-style screens, while
+  GoMate must help users discover a concrete activity, join a moderated group,
+  coordinate it, and close the experience with expenses and ratings.
+- **Decision:** Keep the existing lightweight state navigation and reusable UI,
+  but organize all primary routes around Activity → Match → Join Request →
+  Group → Plan/Expenses → In Progress → Summary → Rating. Use centralized GoMate
+  tokens with violet as primary, pink for match actions, and mint for success.
+- **Consequences:** The prototype communicates the product purpose immediately
+  and can be connected to backend services incrementally. Route state and mock
+  mutations remain local until stable API contracts and a navigation library
+  are introduced.
+- **Supersedes:** The discovery-only interpretation of the Match flow; the
+  existing five-tab shell remains accepted.
+
 ### 2026-09-28 - Centralize display-language state and translation
 
 - **Status:** Accepted

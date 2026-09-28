@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ReactNode } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
-import { colors } from '../theme';
+import { colors, control, typography } from '../theme';
 
 type ScreenHeaderProps = {
   title: string;
@@ -18,7 +18,7 @@ export function ScreenHeader({ title, onBack, right, subtitle }: ScreenHeaderPro
       <View style={styles.side}>
         {onBack && (
           <Pressable accessibilityLabel="Quay lại" onPress={onBack} style={styles.backButton}>
-            <Ionicons color={colors.ink} name="arrow-back" size={22} />
+            <Ionicons color={colors.text} name="chevron-back" size={24} />
           </Pressable>
         )}
       </View>
@@ -32,11 +32,11 @@ export function ScreenHeader({ title, onBack, right, subtitle }: ScreenHeaderPro
 }
 
 const styles = StyleSheet.create({
-  header: { alignItems: 'center', borderBottomColor: '#EEF0F4', borderBottomWidth: 1, flexDirection: 'row', minHeight: 64, paddingHorizontal: 14 },
+  header: { alignItems: 'center', backgroundColor: colors.background, flexDirection: 'row', minHeight: 56, paddingHorizontal: 12 },
   side: { minWidth: 44 },
   right: { alignItems: 'flex-end' },
-  backButton: { alignItems: 'center', backgroundColor: '#F5F6FA', borderRadius: 15, height: 40, justifyContent: 'center', width: 40 },
+  backButton: { alignItems: 'center', borderRadius: control.iconButton / 2, height: control.iconButton, justifyContent: 'center', width: control.iconButton },
   copy: { alignItems: 'center', flex: 1 },
-  title: { color: colors.ink, fontSize: 17, fontWeight: '900' },
-  subtitle: { color: colors.body, fontSize: 10, marginTop: 2 },
+  title: { color: colors.text, ...typography.heading },
+  subtitle: { color: colors.textSecondary, fontSize: 10, lineHeight: 14, marginTop: 1 },
 });

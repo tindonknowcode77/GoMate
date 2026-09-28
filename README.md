@@ -1,13 +1,15 @@
 # GoMate Mobile
 
-Ứng dụng kết nối hoạt động được xây dựng bằng React Native, Expo SDK 57 và
-TypeScript. Luồng hiện tại gồm đăng nhập/đăng ký, hoàn thiện hồ sơ và khu vực
-ứng dụng chính với năm tab: Trang chủ, Match, Tạo, Tin nhắn và Hồ sơ.
+Ứng dụng tìm người cùng tham gia một hoạt động cụ thể, được xây dựng bằng React
+Native, Expo SDK 57 và TypeScript. Luồng hiện tại gồm đăng nhập/đăng ký, xác minh
+email, hoàn thiện hồ sơ và khu vực ứng dụng chính với năm tab: Trang chủ, Match,
+Tạo, Tin nhắn và Hồ sơ.
 
 Tab Match là trung tâm tìm và quản lý hoạt động: mở chế độ khám phá toàn màn hình,
-xem lại yêu cầu đang chờ duyệt, hoặc quản lý hoạt động đã đăng và duyệt thành
-viên. Trong chế độ khám phá, người dùng có thể vuốt ngang để bỏ qua/tham gia,
-cuộn dọc để đọc thêm và mở profile host hoặc từng thành viên.
+xem chi tiết, gửi yêu cầu tham gia, xem yêu cầu đang chờ, hoặc quản lý hoạt động
+đã đăng và duyệt thành viên. Khi được duyệt, mỗi hoạt động có nhóm riêng với
+Chat, Kế hoạch, Chi phí và Thành viên, sau đó đi qua trạng thái đang diễn ra,
+tổng kết và đánh giá.
 
 ## Chạy dự án
 
@@ -33,8 +35,10 @@ Quét QR bằng Expo Go hoặc nhấn `a` để mở Android emulator. Trên Pow
   tạo hoạt động, tin nhắn và các luồng phụ.
 - `src/components/`: header, bottom navigation, activity card và UI dùng lại.
 - `src/data/activities.ts`: dữ liệu activity mẫu cho Match.
+- `src/services/activityService.ts`: adapter mock cho việc đăng hoạt động trong
+  khi backend chưa có contract tương ứng.
 - `src/assets/Activity-image/`: bốn ảnh hoạt động do dự án cung cấp.
 - `docs/`: nhật ký phát triển và quyết định sản phẩm/kỹ thuật.
 
-Hiện dữ liệu và điều hướng được giữ cục bộ để hoàn thiện prototype UI. Backend,
-xác thực thật, upload và lưu trữ lâu dài chưa được kết nối.
+Hiện dữ liệu, trạng thái yêu cầu/nhóm và điều hướng được giữ cục bộ để hoàn thiện
+prototype UI. Backend, xác thực thật, upload và lưu trữ lâu dài chưa được kết nối.

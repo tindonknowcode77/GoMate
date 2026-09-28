@@ -3,13 +3,13 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
-import { colors } from '../theme';
+import { colors, control, radii, typography } from '../theme';
 import { useLanguage } from '../i18n/LanguageContext';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
 type FormFieldProps = {
-  icon: IconName;
+  icon?: IconName;
   label: string;
   value: string;
   onChangeText: (value: string) => void;
@@ -38,20 +38,20 @@ export function FormField({
     <View style={styles.group}>
       <Text style={styles.label}>{label}</Text>
       <View style={[styles.field, multiline && styles.multilineField]}>
-        <Ionicons color={colors.muted} name={icon} size={23} />
+        {icon && <Ionicons color={colors.textMuted} name={icon} size={20} />}
         <TextInput
           autoCapitalize={keyboardType === 'email-address' ? 'none' : 'sentences'}
           keyboardType={keyboardType}
           multiline={multiline}
           onChangeText={onChangeText}
           placeholder={placeholder ? translate(placeholder) : undefined}
-          placeholderTextColor="#A4ADC0"
+          placeholderTextColor={colors.textMuted}
           secureTextEntry={secureTextEntry}
-          style={[styles.input, multiline && styles.multilineInput]}
+          style={[styles.input, !icon && styles.inputWithoutIcon, multiline && styles.multilineInput]}
           value={value}
         />
         {rightIcon && (
-          <Ionicons color={colors.muted} name={rightIcon} onPress={onRightPress} size={23} />
+          <Ionicons color={colors.textMuted} name={rightIcon} onPress={onRightPress} size={20} />
         )}
       </View>
     </View>
@@ -60,21 +60,20 @@ export function FormField({
 
 const styles = StyleSheet.create({
   group: {
-    gap: 8,
+    gap: 7,
   },
   label: {
-    color: '#53617D',
-    fontSize: 15,
-    fontWeight: '600',
+    color: colors.textSecondary,
+    ...typography.label,
   },
   field: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderColor: colors.border,
-    borderRadius: 16,
-    borderWidth: 1.4,
+    borderRadius: radii.input,
+    borderWidth: 1,
     flexDirection: 'row',
-    minHeight: 58,
+    minHeight: control.inputHeight,
     paddingHorizontal: 16,
   },
   multilineField: {
@@ -85,10 +84,12 @@ const styles = StyleSheet.create({
   input: {
     color: colors.ink,
     flex: 1,
-    fontSize: 17,
-    marginLeft: 13,
+    fontSize: 14,
+    lineHeight: 22,
+    marginLeft: 10,
     paddingVertical: 0,
   },
+  inputWithoutIcon: { marginLeft: 0 },
   multilineInput: {
     minHeight: 46,
     textAlignVertical: 'top',

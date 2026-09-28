@@ -2,9 +2,7 @@ import { Text } from './LocalizedText';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-
-import { colors } from '../theme';
+import { colors, shadows } from '../theme';
 
 export type MainTab = 'home' | 'match' | 'create' | 'messages' | 'profile';
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -37,16 +35,13 @@ export function BottomNav({ activeTab, onChange }: BottomNavProps) {
             style={styles.item}
           >
             {create ? (
-              <LinearGradient
-                colors={['#9B3FF4', '#5960F3', '#2D8FF5']}
-                style={[styles.createIcon, active && styles.activeCreateIcon]}
-              >
-                <Ionicons color="#FFFFFF" name="add" size={29} />
-              </LinearGradient>
+              <View style={[styles.createIcon, active && styles.activeCreateIcon]}>
+                <Ionicons color={colors.white} name="add" size={29} />
+              </View>
             ) : (
               <View style={styles.regularIcon}>
                 <Ionicons
-                  color={active ? colors.purple : '#8A94A8'}
+                  color={active ? colors.primary : colors.textMuted}
                   name={active ? item.activeIcon : item.icon}
                   size={22}
                 />
@@ -63,23 +58,19 @@ export function BottomNav({ activeTab, onChange }: BottomNavProps) {
 
 const styles = StyleSheet.create({
   nav: {
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#EEF0F5',
+    backgroundColor: colors.surface,
+    borderTopColor: colors.border,
     borderTopWidth: 1,
     flexDirection: 'row',
-    minHeight: 70,
-    paddingHorizontal: 5,
-    paddingTop: 7,
-    shadowColor: '#1D3156',
-    shadowOffset: { width: 0, height: -7 },
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
+    minHeight: 72,
+    paddingHorizontal: 6,
+    paddingTop: 9,
   },
   item: { alignItems: 'center', flex: 1 },
   regularIcon: { alignItems: 'center', height: 32, justifyContent: 'center', position: 'relative', width: 42 },
-  createIcon: { alignItems: 'center', borderRadius: 22, height: 44, justifyContent: 'center', marginTop: -17, shadowColor: '#555CF1', shadowOffset: { width: 0, height: 7 }, shadowOpacity: 0.24, shadowRadius: 12, width: 44, elevation: 7 },
+  createIcon: { alignItems: 'center', backgroundColor: colors.primary, borderColor: colors.surface, borderRadius: 25, borderWidth: 4, height: 50, justifyContent: 'center', marginTop: -22, width: 50, ...shadows.floating },
   activeCreateIcon: { transform: [{ scale: 1.05 }] },
-  messageDot: { backgroundColor: '#FF4D6E', borderColor: '#FFFFFF', borderRadius: 5, borderWidth: 1.5, height: 8, position: 'absolute', right: 6, top: 3, width: 8 },
-  label: { color: '#8A94A9', fontSize: 9.5, fontWeight: '600', marginTop: 2 },
-  activeLabel: { color: colors.purple, fontWeight: '800' },
+  messageDot: { backgroundColor: colors.match, borderColor: colors.surface, borderRadius: 5, borderWidth: 1.5, height: 8, position: 'absolute', right: 6, top: 3, width: 8 },
+  label: { color: colors.textMuted, fontSize: 10, fontWeight: '500', marginTop: 2 },
+  activeLabel: { color: colors.primary, fontWeight: '800' },
 });

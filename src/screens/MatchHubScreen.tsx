@@ -1,75 +1,215 @@
-import { Text } from '../components/LocalizedText';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Animated, Easing, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { AppHeader } from '../components/AppHeader';
-import { colors, layout } from '../theme';
+import { BrandLogo } from '../components/BrandLogo';
+import { Text } from '../components/LocalizedText';
+import { colors, layout, shadows } from '../theme';
+
+const avatar = require('../assets/profile-avatar.png');
 
 type MatchHubScreenProps = {
   onDiscover: () => void;
   onPending: () => void;
   onManage: () => void;
+  onNotifications: () => void;
+  onPreviewProfile: () => void;
+  pendingCount?: number;
+  hostRequestCount?: number;
 };
 
-export function MatchHubScreen({ onDiscover, onPending, onManage }: MatchHubScreenProps) {
+export function MatchHubScreen({
+  onDiscover,
+  onPending,
+  onManage,
+  onNotifications,
+  onPreviewProfile,
+  pendingCount = 2,
+  hostRequestCount = 3,
+}: MatchHubScreenProps) {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
       <View style={styles.page}>
-        <AppHeader />
-        <Text style={styles.title}>Hoạt động của bạn</Text>
-        <Text style={styles.subtitle}>Tìm trải nghiệm mới và quản lý mọi yêu cầu tại một nơi.</Text>
+        <MatchHubHeader onNotifications={onNotifications} />
+        <Text style={styles.title}>Match</Text>
 
-        <Pressable onPress={onDiscover} style={({ pressed }) => [styles.discoverWrap, pressed && styles.pressed]}>
-          <LinearGradient colors={['#8C42F5', '#555EF3', '#2D8EF5']} end={{ x: 1, y: 1 }} style={styles.discoverCard}>
-            <View style={styles.discoverGlow} />
-            <View style={styles.discoverIcon}><Ionicons color="#FFFFFF" name="search" size={24} /></View>
-            <Text style={styles.discoverEyebrow}>TÌM HOẠT ĐỘNG</Text>
-            <Text style={styles.discoverTitle}>Khám phá từng hoạt động phù hợp với bạn</Text>
-            <Text style={styles.discoverText}>Mở chế độ toàn màn hình để vuốt, đọc chi tiết và kết nối với host.</Text>
-            <View style={styles.discoverAction}><Text style={styles.discoverActionText}>Bắt đầu tìm</Text><Ionicons color="#5A5CEF" name="arrow-forward" size={18} /></View>
-          </LinearGradient>
-        </Pressable>
+        <MatchHero onPress={onDiscover} />
 
-        <Text style={styles.sectionTitle}>Theo dõi & quản lý</Text>
-        <HubCard badge="2 đang chờ" icon="time-outline" note="Các hoạt động bạn đã chọn và đang chờ host duyệt." onPress={onPending} title="Yêu cầu tham gia" />
-        <HubCard badge="3 yêu cầu mới" icon="shield-checkmark-outline" note="Hoạt động đã đăng, danh sách thành viên và yêu cầu cần duyệt." onPress={onManage} title="Hoạt động tôi tổ chức" />
+        <Text style={styles.sectionTitle}>Hoạt động của bạn</Text>
+        <View style={styles.managementCard}>
+          <ManagementRow
+            badgeCount={pendingCount}
+            icon="time-outline"
+            onPress={onPending}
+            subtitle={pendingCount > 0 ? 'Đang chờ' : 'Không có yêu cầu'}
+            title="Yêu cầu tham gia"
+          />
+          <View style={styles.rowDivider} />
+          <ManagementRow
+            badgeCount={hostRequestCount}
+            icon="people-outline"
+            onPress={onManage}
+            subtitle={hostRequestCount > 0 ? 'Yêu cầu mới' : 'Không có yêu cầu'}
+            title="Tôi tổ chức"
+          />
+        </View>
+
+        <Text style={styles.profileSectionTitle}>Hồ sơ của bạn</Text>
+        <ProfilePreviewCard onPress={onPreviewProfile} />
       </View>
     </ScrollView>
   );
 }
 
-function HubCard({ title, note, badge, icon, onPress }: { title: string; note: string; badge: string; icon: 'time-outline' | 'shield-checkmark-outline'; onPress: () => void }) {
+function MatchHubHeader({ onNotifications }: { onNotifications: () => void }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.hubCard, pressed && styles.pressed]}>
-      <View style={styles.hubIcon}><Ionicons color="#5E5CEB" name={icon} size={23} /></View>
-      <View style={styles.hubCopy}><Text style={styles.hubTitle}>{title}</Text><Text style={styles.hubNote}>{note}</Text><View style={styles.badge}><Text style={styles.badgeText}>{badge}</Text></View></View>
-      <Ionicons color="#8A94A8" name="chevron-forward" size={20} />
+    <View style={styles.header}>
+      <BrandLogo compact />
+      <View style={styles.headerActions}>
+        <Pressable accessibilityLabel="Thông báo" onPress={onNotifications} style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}>
+          <Ionicons color={colors.textSecondary} name="notifications-outline" size={23} />
+          <View style={styles.notificationDot} />
+        </Pressable>
+        <Image source={avatar} style={styles.headerAvatar} />
+      </View>
+    </View>
+  );
+}
+
+function MatchHero({ onPress }: { onPress: () => void }) {
+  const [motion] = useState(() => new Animated.Value(0));
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(motion, { duration: 2200, easing: Easing.inOut(Easing.sin), toValue: 1, useNativeDriver: true }),
+        Animated.timing(motion, { duration: 2200, easing: Easing.inOut(Easing.sin), toValue: 0, useNativeDriver: true }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [motion]);
+
+  const rippleStyle = {
+    opacity: motion.interpolate({ inputRange: [0, 1], outputRange: [0.34, 0.8] }),
+    transform: [{ scale: motion.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.04] }) }],
+  };
+  const floatUp = motion.interpolate({ inputRange: [0, 1], outputRange: [5, -7] });
+  const floatDown = motion.interpolate({ inputRange: [0, 1], outputRange: [-4, 7] });
+
+  return (
+    <View style={styles.heroArea}>
+      <Animated.View style={[styles.rippleOuter, rippleStyle]} />
+      <View style={styles.rippleInner} />
+      <Animated.View style={[styles.bubble, styles.bubbleOne, { transform: [{ translateY: floatUp }] }]} />
+      <Animated.View style={[styles.bubble, styles.bubbleTwo, { transform: [{ translateY: floatDown }] }]} />
+      <Animated.View style={[styles.bubble, styles.bubbleThree, { opacity: rippleStyle.opacity, transform: [{ translateY: floatUp }] }]} />
+      <Pressable accessibilityHint="Mở màn hình Match" accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.orbPressable, pressed && styles.orbPressed]}>
+        <LinearGradient colors={[colors.discoveryStart, colors.discoveryMiddle, colors.discoveryEnd]} end={{ x: 1, y: 1 }} start={{ x: 0, y: 0 }} style={styles.discoveryOrb}>
+          <View style={styles.matchIcon}><Ionicons color={colors.primary} name="search" size={25} /></View>
+          <View style={styles.heroLabelRow}>
+            <Text style={styles.heroTitle}>Tìm hoạt động</Text>
+            <Ionicons color={colors.primary} name="arrow-forward" size={18} />
+          </View>
+        </LinearGradient>
+      </Pressable>
+    </View>
+  );
+}
+
+type ManagementRowProps = {
+  badgeCount: number;
+  icon: 'time-outline' | 'people-outline';
+  onPress: () => void;
+  subtitle: string;
+  title: string;
+};
+
+function ManagementRow({ badgeCount, icon, onPress, subtitle, title }: ManagementRowProps) {
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.managementRow, pressed && styles.rowPressed]}>
+      <View style={styles.managementIcon}><Ionicons color={colors.primary} name={icon} size={20} /></View>
+      <View style={styles.managementCopy}>
+        <Text style={styles.managementTitle}>{title}</Text>
+        <Text style={styles.managementSubtitle}>{subtitle}</Text>
+      </View>
+      {badgeCount > 0 && <View style={styles.countBadge}><Text style={styles.countBadgeText}>{badgeCount}</Text></View>}
+      <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
+    </Pressable>
+  );
+}
+
+function ProfilePreviewCard({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.profileCard, pressed && styles.pressed]}>
+      <View style={styles.profileIdentity}>
+        <Image source={avatar} style={styles.profileAvatar} />
+        <View style={styles.profileCopy}>
+          <View style={styles.profileNameRow}>
+            <Text style={styles.profileName}>Minh</Text>
+            <Ionicons color={colors.success} name="checkmark-circle" size={16} />
+          </View>
+          <View style={styles.profileStats}>
+            <Ionicons color={colors.warning} name="star" size={13} />
+            <Text style={styles.profileMeta}>4.8</Text>
+            <View style={styles.metaDot} />
+            <Text style={styles.profileMeta}>12 hoạt động</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.profileAction}>
+        <Text style={styles.profileActionText}>Xem như người khác</Text>
+        <Ionicons color={colors.primary} name="arrow-forward" size={17} />
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: { paddingBottom: 28 },
-  page: { alignSelf: 'center', maxWidth: layout.maxWidth, paddingHorizontal: 18, width: '100%' },
-  title: { color: colors.ink, fontSize: 28, fontWeight: '900', letterSpacing: -0.7, marginTop: 10 },
-  subtitle: { color: colors.body, fontSize: 13, lineHeight: 19, marginTop: 6, maxWidth: 340 },
-  discoverWrap: { borderRadius: 28, marginTop: 23 },
-  discoverCard: { borderRadius: 28, overflow: 'hidden', padding: 21 },
-  discoverGlow: { backgroundColor: 'rgba(255,255,255,0.11)', borderRadius: 100, height: 190, position: 'absolute', right: -58, top: -75, width: 190 },
-  discoverIcon: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.17)', borderRadius: 17, height: 42, justifyContent: 'center', width: 42 },
-  discoverEyebrow: { color: 'rgba(255,255,255,0.76)', fontSize: 10, fontWeight: '900', letterSpacing: 1.2, marginTop: 17 },
-  discoverTitle: { color: '#FFFFFF', fontSize: 23, fontWeight: '900', letterSpacing: -0.5, lineHeight: 29, marginTop: 6, maxWidth: 330 },
-  discoverText: { color: 'rgba(255,255,255,0.82)', fontSize: 12, lineHeight: 18, marginTop: 8, maxWidth: 330 },
-  discoverAction: { alignItems: 'center', alignSelf: 'flex-start', backgroundColor: '#FFFFFF', borderRadius: 16, flexDirection: 'row', gap: 8, marginTop: 18, paddingHorizontal: 15, paddingVertical: 10 },
-  discoverActionText: { color: '#5A5CEF', fontSize: 12, fontWeight: '900' },
-  sectionTitle: { color: colors.ink, fontSize: 18, fontWeight: '900', marginBottom: 12, marginTop: 25 },
-  hubCard: { alignItems: 'center', backgroundColor: '#FFFFFF', borderColor: '#E8EAF1', borderRadius: 22, borderWidth: 1, flexDirection: 'row', marginBottom: 12, padding: 15 },
-  hubIcon: { alignItems: 'center', backgroundColor: '#F0EFFF', borderRadius: 17, height: 46, justifyContent: 'center', width: 46 },
-  hubCopy: { flex: 1, marginLeft: 12 },
-  hubTitle: { color: colors.ink, fontSize: 14, fontWeight: '900' },
-  hubNote: { color: colors.body, fontSize: 10.5, lineHeight: 15, marginTop: 4 },
-  badge: { alignSelf: 'flex-start', backgroundColor: '#F0EEFF', borderRadius: 10, marginTop: 8, paddingHorizontal: 8, paddingVertical: 4 },
-  badgeText: { color: '#5E5CEB', fontSize: 9.5, fontWeight: '800' },
-  pressed: { opacity: 0.72, transform: [{ scale: 0.985 }] },
+  scrollContent: { paddingBottom: 24 },
+  page: { alignSelf: 'center', maxWidth: layout.maxWidth, paddingHorizontal: 20, width: '100%' },
+  header: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 },
+  headerActions: { alignItems: 'center', flexDirection: 'row', gap: 8 },
+  iconButton: { alignItems: 'center', borderRadius: 19, height: 40, justifyContent: 'center', width: 40 },
+  notificationDot: { backgroundColor: colors.match, borderColor: colors.background, borderRadius: 5, borderWidth: 2, height: 9, position: 'absolute', right: 7, top: 6, width: 9 },
+  headerAvatar: { borderColor: colors.surface, borderRadius: 20, borderWidth: 2, height: 40, width: 40 },
+  title: { color: colors.ink, fontSize: 30, fontWeight: '800', letterSpacing: -0.8, marginTop: 8 },
+  heroArea: { alignItems: 'center', height: 280, justifyContent: 'center', marginTop: 0 },
+  rippleOuter: { borderColor: colors.discoveryRipple, borderRadius: 140, borderWidth: 1, height: 280, position: 'absolute', width: 280 },
+  rippleInner: { borderColor: colors.discoveryRippleStrong, borderRadius: 126, borderWidth: 1, height: 252, position: 'absolute', width: 252 },
+  orbPressable: { borderRadius: 114 },
+  discoveryOrb: { alignItems: 'center', borderRadius: 114, height: 228, justifyContent: 'center', width: 228 },
+  matchIcon: { alignItems: 'center', backgroundColor: colors.whiteStrong, borderRadius: 22, height: 44, justifyContent: 'center', width: 44 },
+  heroLabelRow: { alignItems: 'center', flexDirection: 'row', gap: 7, marginTop: 14 },
+  heroTitle: { color: colors.ink, fontSize: 20, fontWeight: '700', letterSpacing: -0.25 },
+  bubble: { backgroundColor: colors.primaryLight, borderColor: colors.whiteStrong, borderRadius: 10, borderWidth: 2, position: 'absolute' },
+  bubbleOne: { height: 14, left: 35, top: 59, width: 14 },
+  bubbleTwo: { bottom: 43, height: 10, right: 45, width: 10 },
+  bubbleThree: { height: 7, right: 27, top: 91, width: 7 },
+  orbPressed: { opacity: 0.82, transform: [{ scale: 0.97 }] },
+  sectionTitle: { color: colors.ink, fontSize: 16, fontWeight: '700', marginBottom: 10, marginTop: 4 },
+  managementCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, overflow: 'hidden', ...shadows.card },
+  managementRow: { alignItems: 'center', flexDirection: 'row', minHeight: 68, paddingHorizontal: 14 },
+  managementIcon: { alignItems: 'center', backgroundColor: colors.primarySoft, borderRadius: 13, height: 40, justifyContent: 'center', width: 40 },
+  managementCopy: { flex: 1, marginLeft: 12 },
+  managementTitle: { color: colors.ink, fontSize: 13.5, fontWeight: '700' },
+  managementSubtitle: { color: colors.textMuted, fontSize: 10.5, marginTop: 3 },
+  countBadge: { alignItems: 'center', backgroundColor: colors.primary, borderRadius: 11, height: 22, justifyContent: 'center', marginRight: 7, minWidth: 22, paddingHorizontal: 6 },
+  countBadgeText: { color: colors.white, fontSize: 10, fontWeight: '800' },
+  rowDivider: { backgroundColor: colors.border, height: StyleSheet.hairlineWidth, marginLeft: 66 },
+  rowPressed: { backgroundColor: colors.surfaceMuted },
+  profileSectionTitle: { color: colors.ink, fontSize: 16, fontWeight: '700', marginBottom: 10, marginTop: 18 },
+  profileCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 18, borderWidth: 1, padding: 14, ...shadows.card },
+  profileIdentity: { alignItems: 'center', flexDirection: 'row' },
+  profileAvatar: { borderRadius: 25, height: 50, width: 50 },
+  profileCopy: { flex: 1, marginLeft: 12 },
+  profileNameRow: { alignItems: 'center', flexDirection: 'row', gap: 5 },
+  profileName: { color: colors.ink, fontSize: 15, fontWeight: '700' },
+  profileStats: { alignItems: 'center', flexDirection: 'row', marginTop: 5 },
+  profileMeta: { color: colors.textSecondary, fontSize: 11, marginLeft: 4 },
+  metaDot: { backgroundColor: colors.textMuted, borderRadius: 2, height: 3, marginLeft: 8, width: 3 },
+  profileAction: { alignItems: 'center', borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth, flexDirection: 'row', justifyContent: 'space-between', marginTop: 12, paddingTop: 11 },
+  profileActionText: { color: colors.primary, fontSize: 12, fontWeight: '700' },
+  pressed: { opacity: 0.74, transform: [{ scale: 0.99 }] },
 });

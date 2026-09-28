@@ -1,24 +1,14 @@
-import { Text } from '../components/LocalizedText';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrandLogo } from '../components/BrandLogo';
 import { FormField } from '../components/FormField';
-import { GradientButton } from '../components/GradientButton';
-import { LanguageSwitcher } from '../components/LanguageSwitcher';
-import { colors, layout } from '../theme';
+import { Text } from '../components/LocalizedText';
+import { colors, control, layout, typography } from '../theme';
 
-type AuthMode = 'login' | 'register';
+type AuthStage = 'welcome' | 'login' | 'signup' | 'forgot' | 'reset' | 'success';
 
 type AuthScreenProps = {
   onLogin: () => void;
@@ -26,202 +16,203 @@ type AuthScreenProps = {
 };
 
 export function AuthScreen({ onLogin, onRegister }: AuthScreenProps) {
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const isLogin = mode === 'login';
+  const [stage, setStage] = useState<AuthStage>('welcome');
+  const [name, setName] = useState('Noah Elhadedly');
+  const [email, setEmail] = useState('noah@gomate.app');
+  const [loginPassword, setLoginPassword] = useState('gomate2026');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('GoMate2026!');
+  const [confirmPassword, setConfirmPassword] = useState('GoMate2026!');
 
-  const continueAuth = () => {
-    if (isLogin) onLogin();
-    else onRegister();
+  if (stage === 'welcome') {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.welcomePage}>
+          <View style={styles.welcomeBrand}>
+            <BrandLogo markOnly />
+            <Text style={styles.welcomeTitle}>Join GoMate</Text>
+            <Text style={styles.welcomeSubtitle}>Create your account and find activities worth showing up for.</Text>
+          </View>
+          <View style={styles.welcomeActions}>
+            <MethodButton icon="mail-outline" label="Continue with email" onPress={() => setStage('signup')} primary />
+            <MethodButton icon="logo-google" label="Continue with Google" onPress={onRegister} />
+            <MethodButton icon="logo-apple" label="Continue with Apple" onPress={onRegister} />
+            <InlinePrompt action="Log in" label="Already have an account?" onPress={() => setStage('login')} />
+          </View>
+          <Text style={styles.legal}>By continuing you agree to our Terms of Service and Privacy Policy.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (stage === 'success') {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.successPage}>
+          <View style={styles.successContent}>
+            <View style={styles.successIconBack} />
+            <View style={styles.successIcon}><Ionicons color={colors.white} name="checkmark" size={27} /></View>
+            <Text style={styles.successTitle}>All done!</Text>
+            <Text style={styles.successSubtitle}>Your password has been reset. You can now log in with your new password.</Text>
+          </View>
+          <PrimaryButton label="Back to log in" onPress={() => setStage('login')} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const goBack = () => {
+    if (stage === 'reset') setStage('forgot');
+    else setStage('welcome');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View pointerEvents="none" style={styles.purpleGlow} />
-      <View pointerEvents="none" style={styles.blueGlow} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.flex}
-      >
-        <ScrollView
-          bounces={false}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.page}>
-            <View style={styles.languageRow}><LanguageSwitcher /></View>
-            <View style={styles.brandArea}>
-              <BrandLogo />
-              <View style={styles.promisePill}>
-                <Ionicons color="#6258EC" name="sparkles" size={14} />
-                <Text style={styles.promiseText}>Kết nối • Trải nghiệm • Đồng hành</Text>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
+        <AuthHeader onBack={goBack} />
+        <ScrollView bounces={false} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {stage === 'login' && (
+            <View style={styles.screenPage}>
+              <View>
+                <AuthHeading subtitle="Log in to pick up where you left off." title="Welcome back" />
+                <View style={styles.fields}>
+                  <FormField keyboardType="email-address" label="Email" onChangeText={setEmail} value={email} />
+                  <FormField label="Password" onChangeText={setLoginPassword} secureTextEntry value={loginPassword} />
+                </View>
+                <Pressable onPress={() => setStage('forgot')} style={styles.forgotLink}><Text style={styles.linkText}>Forgot password?</Text></Pressable>
+                <PrimaryButton label="Log in" onPress={onLogin} />
+                <Text style={styles.orText}>or</Text>
+                <View style={styles.socialButtons}>
+                  <MethodButton icon="logo-google" label="Continue with Google" onPress={onLogin} />
+                  <MethodButton icon="logo-apple" label="Continue with Apple" onPress={onLogin} />
+                </View>
               </View>
-              <Text style={styles.title}>
-                {isLogin ? 'Chào mừng trở lại' : 'Bắt đầu cùng GoMate'}
-              </Text>
-              <Text style={styles.subtitle}>
-                {isLogin
-                  ? 'Đăng nhập để tiếp tục khám phá hoạt động phù hợp.'
-                  : 'Tạo tài khoản và gặp những người cùng sở thích.'}
-              </Text>
+              <InlinePrompt action="Sign up" label="New to GoMate?" onPress={() => setStage('signup')} />
             </View>
+          )}
 
-            <View style={styles.card}>
-              <View style={styles.tabs}>
-                {(['login', 'register'] as AuthMode[]).map((tab) => {
-                  const active = mode === tab;
-                  return (
-                    <Pressable
-                      accessibilityRole="tab"
-                      accessibilityState={{ selected: active }}
-                      key={tab}
-                      onPress={() => setMode(tab)}
-                      style={styles.tabPressable}
-                    >
-                      {active ? (
-                        <LinearGradient
-                          colors={['#7547FA', '#3A80F5']}
-                          end={{ x: 1, y: 0 }}
-                          start={{ x: 0, y: 0 }}
-                          style={styles.activeTab}
-                        >
-                          <Text style={styles.activeTabText}>
-                            {tab === 'login' ? 'Đăng nhập' : 'Đăng ký'}
-                          </Text>
-                        </LinearGradient>
-                      ) : (
-                        <Text style={styles.tabText}>
-                          {tab === 'login' ? 'Đăng nhập' : 'Đăng ký'}
-                        </Text>
-                      )}
-                    </Pressable>
-                  );
-                })}
+          {stage === 'signup' && (
+            <View style={styles.formPage}>
+              <AuthHeading subtitle="Join GoMate and find your communities." title="Create your account" />
+              <View style={styles.fields}>
+                <FormField label="Full name" onChangeText={setName} value={name} />
+                <FormField keyboardType="email-address" label="Email" onChangeText={setEmail} value={email} />
+                <FormField label="Password" onChangeText={setSignupPassword} placeholder="Create a password" secureTextEntry value={signupPassword} />
               </View>
-
-              <View style={styles.form}>
-                {!isLogin && (
-                  <FormField
-                    icon="person-outline"
-                    label="Họ và tên"
-                    onChangeText={setName}
-                    placeholder="Tên của bạn"
-                    value={name}
-                  />
-                )}
-                <FormField
-                  icon="mail-outline"
-                  keyboardType="email-address"
-                  label="Email"
-                  onChangeText={setEmail}
-                  placeholder="you@example.com"
-                  value={email}
-                />
-                <FormField
-                  icon="lock-closed-outline"
-                  label="Mật khẩu"
-                  onChangeText={setPassword}
-                  onRightPress={() => setShowPassword((current) => !current)}
-                  placeholder="Tối thiểu 8 ký tự"
-                  rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                  secureTextEntry={!showPassword}
-                  value={password}
-                />
-              </View>
-
-              {isLogin ? (
-                <Pressable accessibilityRole="button" style={styles.forgotButton}>
-                  <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-                </Pressable>
-              ) : (
-                <Text style={styles.termsText}>
-                  Bằng việc đăng ký, bạn đồng ý với Điều khoản và Chính sách bảo mật.
-                </Text>
-              )}
-
-              <GradientButton
-                label={isLogin ? 'Đăng nhập' : 'Tạo tài khoản'}
-                onPress={continueAuth}
-                style={styles.primaryButton}
-              />
-
-              <View style={styles.dividerRow}>
-                <View style={styles.divider} />
-                <Text style={styles.dividerText}>hoặc tiếp tục với</Text>
-                <View style={styles.divider} />
-              </View>
-
-              <View style={styles.socialRow}>
-                <SocialButton icon="logo-google" label="Google" />
-                <SocialButton icon="logo-apple" label="Apple" />
-                <SocialButton icon="logo-facebook" label="Facebook" />
-              </View>
-
-              <View style={styles.switchRow}>
-                <Text style={styles.switchPrompt}>
-                  {isLogin ? 'Chưa có tài khoản? ' : 'Đã có tài khoản? '}
-                </Text>
-                <Pressable onPress={() => setMode(isLogin ? 'register' : 'login')}>
-                  <Text style={styles.switchLink}>{isLogin ? 'Đăng ký' : 'Đăng nhập'}</Text>
-                </Pressable>
-              </View>
+              <Pressable style={styles.consent}>
+                <View style={styles.checkbox}><Ionicons color={colors.white} name="checkmark" size={14} /></View>
+                <Text style={styles.consentText}>I agree to the Terms of Service and Privacy Policy.</Text>
+              </Pressable>
+              <PrimaryButton label="Create account" onPress={onRegister} />
+              <View style={styles.signupPrompt}><InlinePrompt action="Log in" label="Already have an account?" onPress={() => setStage('login')} /></View>
             </View>
-          </View>
+          )}
+
+          {stage === 'forgot' && (
+            <View style={styles.formPage}>
+              <AuthHeading subtitle="Enter the email linked to your account and we will send you a reset link." title="Forgot password?" />
+              <View style={styles.forgotField}><FormField keyboardType="email-address" label="Email" onChangeText={setEmail} value={email} /></View>
+              <PrimaryButton label="Send reset link" onPress={() => setStage('reset')} />
+              <Pressable onPress={() => setStage('login')} style={styles.backToLogin}><Text style={styles.mutedAction}>Back to log in</Text></Pressable>
+            </View>
+          )}
+
+          {stage === 'reset' && (
+            <View style={styles.screenPage}>
+              <View>
+                <AuthHeading subtitle="Your new password must be different from previous ones." title="Create new password" />
+                <View style={styles.fields}>
+                  <FormField label="New password" onChangeText={setNewPassword} secureTextEntry value={newPassword} />
+                  <FormField label="Confirm password" onChangeText={setConfirmPassword} secureTextEntry value={confirmPassword} />
+                </View>
+                <View style={styles.requirements}>
+                  <Requirement label="At least 8 characters" valid />
+                  <Requirement label="One uppercase letter" valid />
+                  <Requirement label="One number or symbol" />
+                </View>
+              </View>
+              <PrimaryButton label="Reset password" onPress={() => setStage('success')} />
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-function SocialButton({ icon, label }: { icon: 'logo-google' | 'logo-apple' | 'logo-facebook'; label: string }) {
-  return (
-    <Pressable style={({ pressed }) => [styles.socialButton, pressed && styles.pressed]}>
-      <Ionicons
-        color={label === 'Facebook' ? '#1877F2' : label === 'Google' ? '#4285F4' : '#111827'}
-        name={icon}
-        size={23}
-      />
-      <Text style={styles.socialLabel}>{label}</Text>
-    </Pressable>
-  );
+function AuthHeader({ onBack }: { onBack: () => void }) {
+  return <View style={styles.header}>
+    <Pressable accessibilityLabel="Back" hitSlop={8} onPress={onBack} style={styles.headerButton}><Ionicons color={colors.textSecondary} name="chevron-back" size={24} /></Pressable>
+    <Pressable accessibilityLabel="More options" hitSlop={8} style={styles.headerButton}><Ionicons color={colors.text} name="ellipsis-horizontal" size={22} /></Pressable>
+  </View>;
+}
+
+function AuthHeading({ title, subtitle }: { title: string; subtitle: string }) {
+  return <View><Text style={styles.formTitle}>{title}</Text><Text style={styles.formSubtitle}>{subtitle}</Text></View>;
+}
+
+function PrimaryButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return <Pressable onPress={onPress} style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}><Text style={styles.primaryButtonLabel}>{label}</Text></Pressable>;
+}
+
+function InlinePrompt({ action, label, onPress }: { action: string; label: string; onPress: () => void }) {
+  return <View style={styles.inlinePrompt}><Text style={styles.promptText}>{label}</Text><Pressable onPress={onPress}><Text style={styles.linkText}>{action}</Text></Pressable></View>;
+}
+
+function MethodButton({ icon, label, primary = false, onPress }: { icon: 'mail-outline' | 'logo-google' | 'logo-apple'; label: string; primary?: boolean; onPress: () => void }) {
+  return <Pressable onPress={onPress} style={({ pressed }) => [styles.methodButton, primary && styles.primaryMethod, pressed && styles.pressed]}>
+    <Ionicons color={primary ? colors.white : icon === 'logo-google' ? colors.google : colors.text} name={icon} size={21} />
+    <Text style={[styles.methodLabel, primary && styles.primaryButtonLabel]}>{label}</Text>
+  </Pressable>;
+}
+
+function Requirement({ label, valid = false }: { label: string; valid?: boolean }) {
+  return <View style={styles.requirementRow}><Ionicons color={valid ? colors.google : colors.textMuted} name="checkmark" size={17} /><Text style={styles.requirementText}>{label}</Text></View>;
 }
 
 const styles = StyleSheet.create({
-  safeArea: { backgroundColor: '#F8F9FD', flex: 1, overflow: 'hidden' },
+  safeArea: { backgroundColor: colors.background, flex: 1 },
   flex: { flex: 1 },
-  purpleGlow: { backgroundColor: 'rgba(123,70,248,0.12)', borderRadius: 130, height: 260, position: 'absolute', right: -120, top: -90, width: 260 },
-  blueGlow: { backgroundColor: 'rgba(45,143,245,0.09)', borderRadius: 115, bottom: 10, height: 230, left: -145, position: 'absolute', width: 230 },
-  scrollContent: { flexGrow: 1, paddingBottom: 24 },
-  page: { alignSelf: 'center', maxWidth: layout.maxWidth, paddingHorizontal: 18, width: '100%' },
-  languageRow: { alignItems: 'flex-end', marginTop: 8 },
-  brandArea: { alignItems: 'center', paddingBottom: 25, paddingTop: 28 },
-  promisePill: { alignItems: 'center', backgroundColor: '#F0EEFF', borderRadius: 15, flexDirection: 'row', gap: 6, marginTop: 2, paddingHorizontal: 12, paddingVertical: 7 },
-  promiseText: { color: '#6258EC', fontSize: 11, fontWeight: '700' },
-  title: { color: colors.ink, fontSize: 29, fontWeight: '900', letterSpacing: -0.7, marginTop: 21, textAlign: 'center' },
-  subtitle: { color: colors.body, fontSize: 14, lineHeight: 21, marginTop: 7, maxWidth: 330, textAlign: 'center' },
-  card: { backgroundColor: '#FFFFFF', borderColor: '#EAEDF4', borderRadius: 30, borderWidth: 1, padding: 20, shadowColor: '#20365C', shadowOffset: { width: 0, height: 14 }, shadowOpacity: 0.08, shadowRadius: 30, elevation: 6 },
-  tabs: { backgroundColor: '#F3F4F8', borderRadius: 18, flexDirection: 'row', height: 48, padding: 4 },
-  tabPressable: { flex: 1 },
-  activeTab: { alignItems: 'center', borderRadius: 15, flex: 1, justifyContent: 'center' },
-  activeTabText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
-  tabText: { color: '#7F899F', fontSize: 14, fontWeight: '700', paddingTop: 10, textAlign: 'center' },
-  form: { gap: 14, marginTop: 22 },
-  forgotButton: { alignSelf: 'flex-end', paddingVertical: 12 },
-  forgotText: { color: '#5C5DEB', fontSize: 12, fontWeight: '700' },
-  termsText: { color: colors.body, fontSize: 11, lineHeight: 16, paddingVertical: 12, textAlign: 'center' },
-  primaryButton: { marginTop: 4 },
-  dividerRow: { alignItems: 'center', flexDirection: 'row', gap: 11, marginVertical: 21 },
-  divider: { backgroundColor: '#E8EAF0', flex: 1, height: 1 },
-  dividerText: { color: '#9AA3B6', fontSize: 11 },
-  socialRow: { flexDirection: 'row', gap: 9 },
-  socialButton: { alignItems: 'center', borderColor: '#E5E8EF', borderRadius: 16, borderWidth: 1, flex: 1, gap: 6, minHeight: 66, justifyContent: 'center' },
-  socialLabel: { color: '#69748B', fontSize: 10, fontWeight: '600' },
-  pressed: { opacity: 0.65 },
-  switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 21 },
-  switchPrompt: { color: colors.body, fontSize: 12 },
-  switchLink: { color: '#6258EC', fontSize: 12, fontWeight: '800' },
+  welcomePage: { alignSelf: 'center', flex: 1, justifyContent: 'space-between', maxWidth: layout.maxWidth, paddingBottom: 20, paddingHorizontal: 32, paddingTop: 82, width: '100%' },
+  welcomeBrand: { alignItems: 'center' },
+  welcomeTitle: { color: colors.text, marginTop: 16, ...typography.display },
+  welcomeSubtitle: { color: colors.textSecondary, marginTop: 12, maxWidth: 310, textAlign: 'center', ...typography.bodyLarge },
+  welcomeActions: { gap: 12 },
+  legal: { color: colors.textMuted, fontSize: 12, lineHeight: 16, paddingHorizontal: 10, textAlign: 'center' },
+  header: { alignItems: 'center', alignSelf: 'center', flexDirection: 'row', height: 56, justifyContent: 'space-between', maxWidth: layout.maxWidth, paddingHorizontal: 12, width: '100%' },
+  headerButton: { alignItems: 'center', height: 44, justifyContent: 'center', width: 44 },
+  scrollContent: { flexGrow: 1 },
+  screenPage: { alignSelf: 'center', flex: 1, justifyContent: 'space-between', maxWidth: layout.maxWidth, minHeight: 570, paddingBottom: 26, paddingHorizontal: 20, paddingTop: 25, width: '100%' },
+  formPage: { alignSelf: 'center', maxWidth: layout.maxWidth, paddingBottom: 28, paddingHorizontal: 20, paddingTop: 25, width: '100%' },
+  formTitle: { color: colors.text, ...typography.title },
+  formSubtitle: { color: colors.textSecondary, marginTop: 4, maxWidth: 390, ...typography.body },
+  fields: { gap: 14, marginTop: 28 },
+  forgotField: { marginBottom: 28, marginTop: 28 },
+  forgotLink: { alignSelf: 'flex-end', marginBottom: 24, marginTop: 16 },
+  primaryButton: { alignItems: 'center', backgroundColor: colors.primary, borderRadius: 999, height: control.buttonHeight, justifyContent: 'center', width: '100%' },
+  primaryButtonLabel: { color: colors.white, fontSize: 15, fontWeight: '700', lineHeight: 22 },
+  methodButton: { alignItems: 'center', backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 999, borderWidth: 1, flexDirection: 'row', height: control.buttonHeight, justifyContent: 'center' },
+  primaryMethod: { backgroundColor: colors.primary, borderColor: colors.primary },
+  methodLabel: { color: colors.text, fontSize: 15, fontWeight: '600', lineHeight: 22, marginLeft: 9 },
+  socialButtons: { gap: 12 },
+  pressed: { opacity: 0.76, transform: [{ scale: 0.99 }] },
+  inlinePrompt: { alignItems: 'center', flexDirection: 'row', gap: 4, justifyContent: 'center' },
+  signupPrompt: { marginTop: 18 },
+  promptText: { color: colors.textSecondary, ...typography.body },
+  linkText: { color: colors.primary, fontSize: 14, fontWeight: '600', lineHeight: 22 },
+  orText: { color: colors.textMuted, fontSize: 13, lineHeight: 20, marginVertical: 9, textAlign: 'center' },
+  consent: { alignItems: 'center', flexDirection: 'row', marginBottom: 26, marginTop: 22 },
+  checkbox: { alignItems: 'center', backgroundColor: colors.primary, borderRadius: 5, height: 20, justifyContent: 'center', width: 20 },
+  consentText: { color: colors.textSecondary, flex: 1, fontSize: 13, lineHeight: 18, marginLeft: 10 },
+  backToLogin: { alignItems: 'center', paddingTop: 14 },
+  mutedAction: { color: colors.textSecondary, fontSize: 13, lineHeight: 20 },
+  requirements: { gap: 5, marginTop: 14 },
+  requirementRow: { alignItems: 'center', flexDirection: 'row', gap: 7 },
+  requirementText: { color: colors.textSecondary, fontSize: 13, lineHeight: 19 },
+  successPage: { alignSelf: 'center', flex: 1, justifyContent: 'space-between', maxWidth: layout.maxWidth, paddingBottom: 26, paddingHorizontal: 20, paddingTop: 210, width: '100%' },
+  successContent: { alignItems: 'center', position: 'relative' },
+  successIconBack: { backgroundColor: '#9BE9D8', borderRadius: 13, height: 48, left: '50%', marginLeft: -29, position: 'absolute', top: 7, transform: [{ rotate: '-5deg' }], width: 48 },
+  successIcon: { alignItems: 'center', backgroundColor: colors.success, borderRadius: 13, height: 48, justifyContent: 'center', transform: [{ rotate: '8deg' }], width: 48 },
+  successTitle: { color: colors.text, fontSize: 25, fontWeight: '800', letterSpacing: -0.4, lineHeight: 32, marginTop: 28 },
+  successSubtitle: { color: colors.textSecondary, fontSize: 14, lineHeight: 21, marginTop: 8, maxWidth: 310, textAlign: 'center' },
 });

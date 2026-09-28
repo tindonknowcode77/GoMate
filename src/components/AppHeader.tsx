@@ -20,7 +20,7 @@ export function AppHeader({ onFilterPress, onNotificationPress, showNotification
           onPress={onFilterPress}
           style={({ pressed }) => [styles.action, pressed && styles.pressed]}
         >
-          <Ionicons color={colors.ink} name="options-outline" size={22} />
+          <Ionicons color={colors.text} name="options-outline" size={22} />
         </Pressable>
       ) : (
         <Pressable
@@ -28,7 +28,7 @@ export function AppHeader({ onFilterPress, onNotificationPress, showNotification
           onPress={onNotificationPress}
           style={({ pressed }) => [styles.action, pressed && styles.pressed]}
         >
-          <Ionicons color={colors.ink} name="notifications-outline" size={22} />
+          <Ionicons color={colors.text} name="notifications-outline" size={22} />
           {showNotification && <View style={styles.notificationDot} />}
         </Pressable>
       )}
@@ -40,15 +40,12 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     flexDirection: 'row',
-    height: 66,
+    height: 58,
     justifyContent: 'space-between',
   },
   action: {
     alignItems: 'center',
-    backgroundColor: '#F4F5FA',
-    borderColor: '#E9ECF3',
-    borderRadius: 16,
-    borderWidth: 1,
+    borderRadius: 22,
     height: 44,
     justifyContent: 'center',
     position: 'relative',
@@ -56,8 +53,8 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.65 },
   notificationDot: {
-    backgroundColor: '#FF476B',
-    borderColor: '#FFFFFF',
+    backgroundColor: colors.match,
+    borderColor: colors.background,
     borderRadius: 5,
     borderWidth: 2,
     height: 10,

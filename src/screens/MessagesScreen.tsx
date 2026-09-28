@@ -14,9 +14,9 @@ export type Conversation = {
 };
 
 const conversations: Conversation[] = [
+  { id: 'coffee', name: 'Nhóm Cà phê cuối tuần', activity: 'Cà phê cuối tuần', message: 'Minh Anh: Hẹn mọi người sáng thứ Bảy ☕', time: '09:31', unread: 1 },
+  { id: 'badminton', name: 'Nhóm Giao lưu cầu lông', activity: 'Giao lưu cầu lông', message: 'Tuấn Kiệt: Tối mai đến trước 15 phút nha.', time: 'Hôm qua' },
   { id: 'linh', name: 'Linh Nguyễn', activity: 'Săn mây Đà Lạt', message: 'Mình sẽ gửi điểm tập trung nhé!', time: '09:24', unread: 2 },
-  { id: 'tuan', name: 'Tuấn Kiệt', activity: 'Giao lưu cầu lông', message: 'Tối mai mọi người đến trước 15 phút nha.', time: 'Hôm qua' },
-  { id: 'coffee', name: 'Nhóm Cà phê cuối tuần', activity: 'Cà phê cuối tuần', message: 'Minh Anh: Hẹn mọi người sáng thứ Bảy ☕', time: 'T2', unread: 1 },
 ];
 
 type MessagesScreenProps = {
@@ -29,7 +29,7 @@ export function MessagesScreen({ onOpenChat }: MessagesScreenProps) {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Tin nhắn</Text>
-          <Text style={styles.subtitle}>Trao đổi với host và các thành viên</Text>
+          <Text style={styles.subtitle}>Ưu tiên trò chuyện theo nhóm hoạt động</Text>
         </View>
         <Pressable style={styles.searchButton}>
           <Ionicons color={colors.ink} name="search-outline" size={22} />
@@ -69,21 +69,21 @@ const styles = StyleSheet.create({
   header: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 18, paddingTop: 21 },
   title: { color: colors.ink, fontSize: 27, fontWeight: '900', letterSpacing: -0.6 },
   subtitle: { color: colors.body, fontSize: 12, marginTop: 5 },
-  searchButton: { alignItems: 'center', backgroundColor: '#F4F5F9', borderRadius: 17, height: 44, justifyContent: 'center', width: 44 },
+  searchButton: { alignItems: 'center', backgroundColor: colors.surfaceMuted, borderRadius: 17, height: 44, justifyContent: 'center', width: 44 },
   list: { paddingBottom: 24 },
-  row: { alignItems: 'center', borderBottomColor: '#EEF0F4', borderBottomWidth: 1, flexDirection: 'row', paddingVertical: 16 },
+  row: { alignItems: 'center', borderBottomColor: colors.border, borderBottomWidth: 1, flexDirection: 'row', paddingVertical: 16 },
   pressed: { opacity: 0.65 },
-  avatar: { alignItems: 'center', backgroundColor: '#EDEBFF', borderRadius: 23, height: 52, justifyContent: 'center', position: 'relative', width: 52 },
-  avatarText: { color: '#5E5CEB', fontSize: 18, fontWeight: '900' },
-  onlineDot: { backgroundColor: '#28C78A', borderColor: '#FFFFFF', borderRadius: 6, borderWidth: 2, bottom: 0, height: 12, position: 'absolute', right: 0, width: 12 },
+  avatar: { alignItems: 'center', backgroundColor: colors.primarySoft, borderRadius: 23, height: 52, justifyContent: 'center', position: 'relative', width: 52 },
+  avatarText: { color: colors.primary, fontSize: 18, fontWeight: '900' },
+  onlineDot: { backgroundColor: colors.success, borderColor: colors.white, borderRadius: 6, borderWidth: 2, bottom: 0, height: 12, position: 'absolute', right: 0, width: 12 },
   copy: { flex: 1, marginLeft: 13 },
   nameRow: { alignItems: 'center', flexDirection: 'row' },
   name: { color: colors.ink, flex: 1, fontSize: 14, fontWeight: '800' },
-  time: { color: '#9AA3B5', fontSize: 10 },
-  activity: { color: '#655BE9', fontSize: 10.5, fontWeight: '700', marginTop: 3 },
+  time: { color: colors.textMuted, fontSize: 10 },
+  activity: { color: colors.primary, fontSize: 10.5, fontWeight: '700', marginTop: 3 },
   messageRow: { alignItems: 'center', flexDirection: 'row', marginTop: 4 },
-  message: { color: '#7A859A', flex: 1, fontSize: 12 },
-  unreadMessage: { color: '#4C5870', fontWeight: '700' },
-  unreadBadge: { alignItems: 'center', backgroundColor: '#655BEF', borderRadius: 9, height: 18, justifyContent: 'center', marginLeft: 8, minWidth: 18 },
-  unreadText: { color: '#FFFFFF', fontSize: 9, fontWeight: '800' },
+  message: { color: colors.textSecondary, flex: 1, fontSize: 12 },
+  unreadMessage: { color: colors.text, fontWeight: '700' },
+  unreadBadge: { alignItems: 'center', backgroundColor: colors.primary, borderRadius: 9, height: 18, justifyContent: 'center', marginLeft: 8, minWidth: 18 },
+  unreadText: { color: colors.white, fontSize: 9, fontWeight: '800' },
 });

@@ -3,6 +3,388 @@
 This file records completed development work. Keep the newest entry at the top
 and follow `templates/development-log-entry.md`.
 
+## 2026-09-29 - Replace the find-companion onboarding visual
+
+### Summary
+
+- Replaced the programmatically composed first onboarding illustration with
+  the supplied `timnguoidonghanh.png` artwork.
+- Removed the obsolete avatar bubbles, connection lines, and center-logo styles
+  from that slide.
+- Used contained image sizing so the complete artwork remains visible on narrow
+  mobile screens without cropping its outer people and activity icons.
+
+### Files changed
+
+- `src/screens/OnboardingScreen.tsx`
+- `src/assets/timnguoidonghanh.png`
+- `docs/DEVELOPMENT_LOG.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo export --platform android --output-dir .tmp-onboarding-image-export`:
+  Passed; the generated verification output was removed afterward.
+
+### Remaining work
+
+- None.
+
+## 2026-09-29 - Refine Match Hub into a compact social-app entry point
+
+### Summary
+
+- Replaced the oversized organic hero and floating activity photos with a
+  compact discovery orb, two restrained radar ripples, and small native-driven
+  floating bubbles.
+- Removed the redundant "Bắt đầu Match" button and made the complete enlarged
+  discovery orb the tap target for opening the existing Match screen.
+- Consolidated pending and hosted activity actions into one neutral white
+  management card with consistent icon, badge, and row treatments.
+- Reworked the profile entry into a mini public-profile preview showing the
+  user's avatar, verification, rating, and activity count.
+- Reduced typography weight, decoration, color variety, vertical gaps, and
+  overall screen height while preserving every existing route and action.
+- Kept activity imagery exclusive to the full Match discovery screen.
+
+### Files changed
+
+- `src/screens/MatchHubScreen.tsx`
+- `src/theme.ts`
+- `docs/DEVELOPMENT_LOG.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo-doctor`: Passed all 21 checks.
+- `npx expo export --platform android --output-dir .tmp-match-hub-refine`:
+  Passed; the generated verification output was removed afterward.
+
+### Remaining work
+
+- Replace the displayed request counts and profile summary with API-derived
+  values when those services are available.
+
+## 2026-09-29 - Redesign the Match management hub
+
+### Summary
+
+- Kept the existing full-screen Match swipe, gesture, filter, and activity
+  detail experience unchanged.
+- Replaced the old "Hoạt động của bạn" layout with a compact Match hub built
+  around a visual discovery hero, two management shortcuts, and a public
+  profile-preview entry.
+- Added zero-count handling for pending and hosted-request badges.
+- Added an own-profile public preview mode with a viewer-context notice,
+  profile statistics, interests, cover-cropped activity photos, a community
+  review, and a persistent edit-profile action.
+- Reused the current profile model and edit flow instead of introducing a
+  duplicate screen or mock backend endpoint.
+
+### Files changed
+
+- `src/screens/MatchHubScreen.tsx`
+- `src/screens/MemberProfileScreen.tsx`
+- `src/screens/MainApp.tsx`
+- `src/data/people.ts`
+- `src/theme.ts`
+- `docs/DEVELOPMENT_LOG.md`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo-doctor`: Passed all 21 checks.
+- `npx expo export --platform android --output-dir .tmp-match-hub-export`:
+  Passed; the generated verification output was removed afterward.
+
+### Remaining work
+
+- Replace the hub counters, current-user preview data, gallery, and community
+  review mock data when their APIs are available.
+
+## 2026-09-29 - Rebuild Home as an activity-management dashboard
+
+### Summary
+
+- Removed Match promotion, recommendations, nearby discovery, and category
+  discovery from Home so new-activity discovery remains exclusive to Match.
+- Added an overview state centered on the next activity, plan/group quick
+  actions, and conditional actionable items such as join requests, polls, and
+  expenses.
+- Added a calendar state with a weekly date strip and compact lists for the
+  selected day, upcoming activities, and previously joined activities.
+- Added an empty state with no recommended activities, a single Match CTA, and
+  three short GoMate benefits.
+- Extracted reusable Home header, next-activity card, action section, calendar,
+  schedule item, and empty-state components.
+
+### Files changed
+
+- `src/components/home/HomeComponents.tsx`
+- `src/screens/HomeScreen.tsx`
+- `src/screens/MainApp.tsx`
+- `src/i18n/LanguageContext.tsx`
+- `docs/DEVELOPMENT_LOG.md`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo-doctor`: Passed all 21 checks.
+- `npx expo export --platform android --output-dir .tmp-home-export`: Passed;
+  the generated verification output was removed afterward.
+
+### Remaining work
+
+- Home currently uses mock schedule/action data. API-derived participation,
+  hosting, polls, expenses, countdowns, and empty-state selection remain to be
+  connected when those services are available.
+
+## 2026-09-29 - Redesign the complete Match experience
+
+### Summary
+
+- Replaced the dark, full-image Match deck with a light, single-activity flow:
+  cover image, connected white summary card, inline scrollable details, and only
+  Skip/Interested as primary decisions.
+- Rebuilt filtering around distance, category, detailed availability, and cost,
+  including the multi-day availability picker and custom time range UI.
+- Added reusable Match header/card/actions, filter content, more menu, report,
+  safety, undo, availability, and category-preference sheets.
+- Added one-use undo behavior, session-only hiding, GoMate-specific reporting
+  and safety content, and UI states for loading, no results, unavailable
+  activities, location permission, and network errors.
+- Restored horizontal card gestures: swipe left skips and swipe right sends the
+  join request, while vertical gestures continue scrolling inline details.
+- Moved Undo and the report/more menu into the image's upper-left controls and
+  fixed activity thumbnails to fill four equal-width cover slots.
+- Added centralized Match colors and Vietnamese/English copy for the new flow.
+
+### Files changed
+
+- `src/components/match/MatchPrimitives.tsx`
+- `src/components/match/MatchSheets.tsx`
+- `src/screens/MatchScreen.tsx`
+- `src/screens/FilterScreen.tsx`
+- `src/screens/MainApp.tsx`
+- `src/i18n/LanguageContext.tsx`
+- `src/theme.ts`
+- `docs/DEVELOPMENT_LOG.md`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo-doctor`: Passed all 21 checks.
+- `npx expo export --platform android --output-dir .tmp-match-export`: Passed;
+  the generated verification output was removed afterward.
+- Follow-up Android export to `.tmp-match-swipe-export`: Passed; generated
+  output was removed afterward.
+
+### Remaining work
+
+- Hide/category preferences, reports, location permission, and error retries are
+  local UI behavior until their backend and platform services are connected.
+
+## 2026-09-29 - Build the GoMate settings and notification suite
+
+### Summary
+
+- Rebuilt Settings in the supplied minimal mobile style and adapted all labels,
+  quantities, and examples to GoMate.
+- Added navigable Account, Privacy & Safety, Notification Preferences,
+  Appearance, Language, Change Password, GoMate Plus, Help Center, Blocked
+  Accounts, and About screens.
+- Restyled the main notification inbox with GoMate-specific join requests,
+  messages, host updates, reminders, read state, and chronological sections.
+- Added Vietnamese/English translations for the new settings experience.
+
+### Files changed
+
+- `src/screens/SettingsScreen.tsx`
+- `src/screens/NotificationsScreen.tsx`
+- `src/i18n/LanguageContext.tsx`
+- `docs/DEVELOPMENT_LOG.md`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo-doctor`: Passed all 21 checks.
+- `npx expo export --platform android --output-dir .tmp-settings-export`:
+  Passed; the generated verification output was removed afterward.
+
+### Remaining work
+
+- Settings controls currently update local UI state only; persistence,
+  account-security actions, billing, search, and external legal links require
+  their corresponding backend or platform integrations.
+
+## 2026-09-29 - Rebuild the authentication screens from the reference
+
+### Summary
+
+- Rebuilt the authentication journey to match the supplied mobile reference:
+  Log In, Sign Up, Verify Email, Forgot Password, Reset Password, and Password
+  Reset Success.
+- Added the reference-style minimal header, pill actions, social sign-in rows,
+  five-cell verification code input, password requirements, and success state.
+- Kept the existing Get Started screen as the entry point and added complete
+  Vietnamese/English copy for the new states.
+
+### Files changed
+
+- `src/screens/AuthScreen.tsx`
+- `src/screens/VerifyEmailScreen.tsx`
+- `src/i18n/LanguageContext.tsx`
+- `docs/DEVELOPMENT_LOG.md`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm run typecheck`: Passed.
+- `npm run lint`: Passed with no warnings.
+- `npx expo-doctor`: Passed all 21 checks.
+- `npx expo export --platform android --output-dir .tmp-auth-export`: Passed;
+  the generated verification output was removed afterward.
+
+### Remaining work
+
+- Visual browser capture was unavailable because no in-app browser session was
+  exposed in the current environment. Authentication and password recovery are
+  still UI-only until the backend endpoints are connected.
+
+## 2026-09-29 - Complete the Figma onboarding sequence
+
+### Summary
+
+- Added the full relevant onboarding path: app-icon Splash, Find your mate,
+  Share your world, Build your community, Get Started/Auth, Create Profile,
+  Interests, Notifications, Location, and You are all set.
+- Replaced the temporary code-drawn brand mark with the real `logo-app.png`,
+  `logo-nobackground.png`, and `logofont.png` assets throughout onboarding,
+  authentication, and the app header.
+- Reused `onboarding-landscape.png` for the Share your world illustration and
+  kept the intro/permission layouts aligned with the supplied Figma section.
+- Kept Suggested Communities and Suggested People out of the flow because
+  those social-network features are outside GoMate's product scope.
+- Added Vietnamese/English onboarding copy and mock permission transitions with
+  explicit TODOs for future native permission-service integration.
+
+### Files changed
+
+- `App.tsx`
+- `src/screens/OnboardingScreen.tsx`
+- `src/screens/OnboardingPermissionsScreen.tsx`
+- `src/components/BrandLogo.tsx`
+- `src/i18n/LanguageContext.tsx`
+- `docs/DECISIONS.md`
+
+### Verification
+
+- `npm.cmd run typecheck`: Passed.
+- `npm.cmd run lint`: Passed.
+- `npx.cmd expo-doctor`: Passed all 21 checks.
+- `npx.cmd expo export --platform android --output-dir dist`: Passed.
+- Mobile-size browser renders reviewed for Splash, all three intro pages,
+  Get Started, Notifications, Location, and You are all set.
+
+### Remaining work
+
+- Connect the permission CTAs to native notification and location services once
+  those integrations are introduced.
+
+## 2026-09-29 - Replace the legacy UI with the Figma visual language
+
+### Summary
+
+- Rebuilt the entry experience around the Figma `05 · Get Started` and
+  `06 · Create Profile` patterns instead of restyling the previous auth cards.
+- Replaced the primary Home and Match layouts with a flat, image-led hierarchy,
+  one full-screen activity card, focused actions, and Figma-like spacing,
+  typography, controls, headers, and bottom navigation.
+- Kept the GoMate activity lifecycle and existing state callbacks while
+  rebuilding Create as a staged flow and retaining dedicated detail, group,
+  activity, summary, rating, messages, notifications, and profile screens.
+- Centralized brand and semantic colors in `src/theme.ts`, removed the unused
+  legacy onboarding header, and removed the old blue gradient from Filter.
+- Added Vietnamese/English strings for the new Figma-derived entry and Home UI.
+
+### Files changed
+
+- `src/theme.ts`, `src/i18n/LanguageContext.tsx`
+- `src/components/BrandLogo.tsx`, `src/components/FormField.tsx`
+- `src/components/GradientButton.tsx`, `src/components/AppHeader.tsx`
+- `src/components/BottomNav.tsx`, `src/components/ActivityCard.tsx`
+- `src/screens/AuthScreen.tsx`, `src/screens/ProfileScreen.tsx`
+- `src/screens/HomeScreen.tsx`, `src/screens/MatchScreen.tsx`
+- `src/screens/FilterScreen.tsx`, `src/screens/CreateActivityScreen.tsx`
+- Supporting activity, member, messaging, notification, and profile screens
+
+### Verification
+
+- `npm.cmd run typecheck`: Passed.
+- `npm.cmd run lint`: Passed.
+- `npx.cmd expo-doctor`: Passed all 21 checks.
+- `npx.cmd expo export --platform android --output-dir dist`: Passed.
+- Mobile-size browser renders reviewed for Get Started, Login, Home, Match,
+  Filter, Create Activity, and Profile.
+
+### Remaining work
+
+- Re-run a direct Figma node inspection if the Starter-plan MCP quota resets;
+  this pass used the node context already retrieved plus the supplied reference
+  screenshot after the quota was exhausted.
+- Replace mock service/state transitions with backend contracts when available.
+
+## 2026-09-29 - Refactor GoMate around the activity lifecycle
+
+### Summary
+
+- Reframed the existing prototype around Activity → Match → Join Request →
+  Group → In Progress → Summary → Rating instead of social-network concepts.
+- Added centralized violet/match/success design tokens and migrated primary
+  buttons, navigation, Match actions, and core surfaces away from the old blue
+  gradient treatment.
+- Added email verification, activity detail, four-step activity creation,
+  group Chat/Plan/Expenses/Members, activity lifecycle, rating, and settings.
+- Expanded Home, profile, notifications, applicant trust metrics, and activity
+  fixture data while preserving the existing Expo architecture and API boundary.
+
+### Files changed
+
+- `App.tsx`, `src/theme.ts`, `src/screens/MainApp.tsx`
+- `src/screens/VerifyEmailScreen.tsx`, `src/screens/ActivityDetailScreen.tsx`
+- `src/screens/GroupScreen.tsx`, `src/screens/ActivityProgressScreen.tsx`
+- `src/screens/ActivitySummaryScreen.tsx`, `src/screens/RatingScreen.tsx`
+- `src/screens/SettingsScreen.tsx`, `src/screens/CreateActivityScreen.tsx`
+- Core Home, Match, messaging, profile, host-management screens and components
+- `src/data/activities.ts`, `src/data/people.ts`
+- `src/services/activityService.ts`, `README.md`, `docs/DECISIONS.md`
+
+### Verification
+
+- `npm.cmd run typecheck`: Passed.
+- `npm.cmd run lint`: Passed.
+- `npx.cmd expo-doctor`: Passed all 21 checks.
+- `npx.cmd expo export --platform android --output-dir dist`: Passed.
+- Expo web dev bundle: Started successfully with no application runtime error.
+- Visual browser QA was not available because no in-app browser session was
+  exposed in the environment.
+
+### Remaining work
+
+- Replace the mock activity service and local route/state transitions with real
+  backend contracts when they become available.
+- Persist authentication, group data, expenses, lifecycle updates, and ratings.
+
 ## 2026-09-28 - Add Vietnamese and English language switching
 
 ### Summary

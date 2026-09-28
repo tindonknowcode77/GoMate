@@ -1,7 +1,8 @@
 import { Text } from './LocalizedText';
-import { Pressable, StyleSheet, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
 import { ReactNode } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
+
+import { colors, control, radii, typography } from '../theme';
 
 type GradientButtonProps = {
   label: string;
@@ -17,27 +18,17 @@ export function GradientButton({ label, onPress, style, trailing }: GradientButt
       onPress={onPress}
       style={({ pressed }) => [styles.shadow, style, pressed && styles.pressed]}
     >
-      <LinearGradient
-        colors={['#7042FF', '#4165F5', '#2497F5']}
-        end={{ x: 1, y: 0 }}
-        start={{ x: 0, y: 0 }}
-        style={styles.gradient}
-      >
+      <View style={styles.gradient}>
         <Text style={styles.label}>{label}</Text>
-        {trailing ?? <Text style={styles.arrow}>→</Text>}
-      </LinearGradient>
+        {trailing === undefined ? <Text style={styles.arrow}>→</Text> : trailing}
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   shadow: {
-    borderRadius: 24,
-    shadowColor: '#4076F5',
-    shadowOffset: { width: 0, height: 9 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
-    elevation: 8,
+    borderRadius: radii.button,
   },
   pressed: {
     opacity: 0.86,
@@ -45,19 +36,19 @@ const styles = StyleSheet.create({
   },
   gradient: {
     alignItems: 'center',
-    borderRadius: 24,
+    backgroundColor: colors.primary,
+    borderRadius: radii.button,
     flexDirection: 'row',
-    height: 58,
+    height: control.buttonHeight,
     justifyContent: 'center',
   },
   label: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '700',
+    color: colors.white,
+    ...typography.heading,
   },
   arrow: {
-    color: '#FFFFFF',
-    fontSize: 28,
+    color: colors.white,
+    fontSize: 23,
     fontWeight: '300',
     marginLeft: 12,
     marginTop: -2,

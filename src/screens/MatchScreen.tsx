@@ -1,189 +1,130 @@
-import { Text } from '../components/LocalizedText';
 import { useCallback, useMemo, useState } from 'react';
-import {
-  Animated,
-  LayoutChangeEvent,
-  PanResponder,
-  Pressable,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Animated, PanResponder, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SwipeActivityCard } from '../components/ActivityCard';
+import { ActivityMatchCard, MatchActions, MatchHeader, MatchState } from '../components/match/MatchPrimitives';
+import { MatchMoreMenu, NotInterestedSheet, ReportActivitySheet, SafetySheet, UndoSheet } from '../components/match/MatchSheets';
 import { Activity, activities } from '../data/activities';
-import { colors } from '../theme';
+import { colors, layout } from '../theme';
+
+type SheetName = 'more' | 'report' | 'safety' | 'undo' | 'notInterested' | null;
 
 type MatchScreenProps = {
   activityItems?: Activity[];
   onFilterPress: () => void;
   onMatched: (activity: Activity) => void;
-  onViewPeople: (activity: Activity) => void;
   onBack: () => void;
+  state?: 'ready' | 'loading' | 'location-required' | 'network-error' | 'activity-unavailable';
 };
 
-export function MatchScreen({
-  activityItems = activities,
-  onFilterPress,
-  onMatched,
-  onViewPeople,
-  onBack,
-}: MatchScreenProps) {
+export function MatchScreen({ activityItems = activities, onFilterPress, onMatched, onBack, state = 'ready' }: MatchScreenProps) {
   const { width } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [lastSkippedIndex, setLastSkippedIndex] = useState<number | null>(null);
+  const [undoUsed, setUndoUsed] = useState(false);
+  const [sheet, setSheet] = useState<SheetName>(null);
   const [position] = useState(() => new Animated.ValueXY());
-  const [deckHeight, setDeckHeight] = useState(0);
-  const contentWidth = width;
-  const hasResults = activityItems.length > 0;
-  const deckActivities = hasResults ? activityItems : activities;
-  const currentActivity = deckActivities[currentIndex % deckActivities.length];
-  const nextActivity = deckActivities[(currentIndex + 1) % deckActivities.length];
+  const currentActivity = activityItems[currentIndex];
+  const canUndo = lastSkippedIndex !== null && !undoUsed;
 
-  const finishSwipe = useCallback(() => {
-    position.setValue({ x: 0, y: 0 });
-    setCurrentIndex((current) => (current + 1) % deckActivities.length);
-  }, [deckActivities.length, position]);
+  const skipCurrent = useCallback(() => {
+    setLastSkippedIndex(currentIndex);
+    setCurrentIndex((current) => current + 1);
+    setSheet(null);
+  }, [currentIndex]);
 
   const swipe = useCallback((direction: 'left' | 'right') => {
     Animated.timing(position, {
-      duration: 240,
-      toValue: { x: direction === 'right' ? width * 1.25 : -width * 1.25, y: 8 },
+      duration: 230,
+      toValue: { x: direction === 'right' ? width * 1.25 : -width * 1.25, y: 4 },
       useNativeDriver: true,
     }).start(() => {
-      finishSwipe();
-      if (direction === 'right') onMatched(currentActivity);
+      position.setValue({ x: 0, y: 0 });
+      if (direction === 'left') skipCurrent();
+      else if (currentActivity) onMatched(currentActivity);
     });
-  }, [currentActivity, finishSwipe, onMatched, position, width]);
+  }, [currentActivity, onMatched, position, skipCurrent, width]);
 
-  const panResponder = useMemo(
-    () => PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => (
-        Math.abs(gesture.dx) > 8 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.15
-      ),
-      onPanResponderMove: (_, gesture) => {
-        position.setValue({ x: gesture.dx, y: gesture.dy * 0.16 });
-      },
-      onPanResponderRelease: (_, gesture) => {
-        if (gesture.dx > 95) swipe('right');
-        else if (gesture.dx < -95) swipe('left');
-        else {
-          Animated.spring(position, {
-            friction: 6,
-            tension: 50,
-            toValue: { x: 0, y: 0 },
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    }),
-    [position, swipe],
-  );
+  const panResponder = useMemo(() => PanResponder.create({
+    onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 10 && Math.abs(gesture.dx) > Math.abs(gesture.dy) * 1.3,
+    onPanResponderMove: (_, gesture) => position.setValue({ x: gesture.dx, y: gesture.dy * 0.08 }),
+    onPanResponderRelease: (_, gesture) => {
+      if (gesture.dx > 82) swipe('right');
+      else if (gesture.dx < -82) swipe('left');
+      else Animated.spring(position, { friction: 7, tension: 55, toValue: { x: 0, y: 0 }, useNativeDriver: true }).start();
+    },
+    onPanResponderTerminate: () => Animated.spring(position, { friction: 7, tension: 55, toValue: { x: 0, y: 0 }, useNativeDriver: true }).start(),
+  }), [position, swipe]);
 
-  const rotate = position.x.interpolate({
-    inputRange: [-width, 0, width],
-    outputRange: ['-9deg', '0deg', '9deg'],
-  });
-  const likeOpacity = position.x.interpolate({
-    inputRange: [0, 80, 150],
-    outputRange: [0, 0.45, 1],
-    extrapolate: 'clamp',
-  });
-  const skipOpacity = position.x.interpolate({
-    inputRange: [-150, -80, 0],
-    outputRange: [1, 0.45, 0],
-    extrapolate: 'clamp',
-  });
+  const rotate = position.x.interpolate({ inputRange: [-width, 0, width], outputRange: ['-7deg', '0deg', '7deg'] });
 
-  if (!hasResults) {
+  const undoSkip = () => {
+    if (lastSkippedIndex === null || undoUsed) return;
+    setCurrentIndex(lastSkippedIndex);
+    setUndoUsed(true);
+    setSheet(null);
+  };
+
+  if (state !== 'ready') {
+    const states = {
+      loading: { icon: 'calendar-outline' as const, title: 'Đang tìm hoạt động phù hợp', message: 'GoMate đang chuẩn bị những gợi ý tốt nhất cho bạn.', action: undefined },
+      'location-required': { icon: 'location-outline' as const, title: 'Cần quyền truy cập vị trí', message: 'Bật vị trí để xem các hoạt động phù hợp đang diễn ra gần bạn.', action: 'Bật vị trí' },
+      'network-error': { icon: 'cloud-offline-outline' as const, title: 'Không thể kết nối', message: 'Kiểm tra kết nối mạng và thử lại sau ít phút.', action: 'Thử lại' },
+      'activity-unavailable': { icon: 'calendar-outline' as const, title: 'Hoạt động không còn khả dụng', message: 'Hoạt động có thể đã đủ thành viên, bị hủy hoặc được host đóng.', action: 'Xem hoạt động tiếp theo' },
+    };
+    const currentState = states[state];
     return (
       <SafeAreaView style={styles.safeArea}>
-        <View style={[styles.page, { width: contentWidth }]}> 
-          <DiscoveryHeader onBack={onBack} onFilter={onFilterPress} />
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}>
-              <Ionicons color="#5D5CEF" name="options-outline" size={29} />
-            </View>
-            <Text style={styles.emptyTitle}>Chưa tìm thấy hoạt động phù hợp</Text>
-            <Text style={styles.emptyText}>Hãy mở rộng khoảng cách hoặc chọn thêm loại hoạt động để tiếp tục Match.</Text>
-            <Pressable onPress={onFilterPress} style={({ pressed }) => [styles.emptyButton, pressed && styles.pressed]}>
-              <Ionicons color="#FFFFFF" name="options" size={18} />
-              <Text style={styles.emptyButtonText}>Chỉnh bộ lọc</Text>
-            </Pressable>
-          </View>
+        <View style={styles.page}><MatchHeader onBack={onBack} onFilter={onFilterPress} /><MatchState action={currentState.action} icon={currentState.icon} message={currentState.message} onAction={currentState.action ? onFilterPress : undefined} title={currentState.title} /></View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!currentActivity) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.page}>
+          <MatchHeader onBack={onBack} onFilter={onFilterPress} />
+          <MatchState action={canUndo ? 'Quay lại hoạt động vừa bỏ qua' : 'Điều chỉnh bộ lọc'} icon="calendar-outline" message="Hãy mở rộng khoảng cách, thời gian rảnh hoặc danh mục để tiếp tục Match." onAction={canUndo ? () => setSheet('undo') : onFilterPress} title="Không còn hoạt động phù hợp" />
         </View>
+        <UndoSheet onCancel={() => setSheet(null)} onConfirm={undoSkip} visible={sheet === 'undo'} />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={[styles.page, { width: contentWidth }]}> 
-        <DiscoveryHeader onBack={onBack} onFilter={onFilterPress} />
-        <View onLayout={(event: LayoutChangeEvent) => setDeckHeight(event.nativeEvent.layout.height)} style={styles.deck}> 
-          {deckHeight > 0 && (
-            <>
-              <View style={styles.nextCard}><SwipeActivityCard activity={nextActivity} fullScreen height={deckHeight} onViewPeople={() => undefined} /></View>
-              <Animated.View {...panResponder.panHandlers} style={[styles.currentCard, { transform: [...position.getTranslateTransform(), { rotate }] }]}>
-                <SwipeActivityCard activity={currentActivity} fullScreen height={deckHeight} onViewPeople={() => onViewPeople(currentActivity)} />
-                <View style={styles.counterOverlay}><Text style={styles.counterText}>{(currentIndex % deckActivities.length) + 1}/{deckActivities.length}</Text></View>
-                <Animated.View style={[styles.swipeBadge, styles.skipBadge, { opacity: skipOpacity }]}><Text style={styles.skipBadgeText}>BỎ QUA</Text></Animated.View>
-                <Animated.View style={[styles.swipeBadge, styles.likeBadge, { opacity: likeOpacity }]}><Text style={styles.likeBadgeText}>THAM GIA</Text></Animated.View>
-              </Animated.View>
-            </>
-          )}
-          <View style={styles.actions}>
-            <Pressable accessibilityLabel="Bỏ qua hoạt động" onPress={() => swipe('left')} style={({ pressed }) => [styles.skipAction, pressed && styles.pressed]}><Ionicons color="#F04D69" name="close" size={31} /></Pressable>
-            <Pressable accessibilityLabel="Xác nhận tham gia hoạt động" onPress={() => swipe('right')} style={({ pressed }) => [styles.likeActionShadow, pressed && styles.pressed]}><LinearGradient colors={['#A33AF5', '#4F5FF4', '#288FF5']} style={styles.likeAction}><Ionicons color="#FFFFFF" name="checkmark" size={31} /></LinearGradient></Pressable>
-          </View>
-        </View>
+      <View style={styles.page}>
+        <MatchHeader onBack={onBack} onFilter={onFilterPress} />
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <Animated.View {...panResponder.panHandlers} style={{ transform: [...position.getTranslateTransform(), { rotate }] }}>
+            <ActivityMatchCard activity={currentActivity} canUndo={canUndo} onMore={() => setSheet('more')} onUndo={() => setSheet('undo')} />
+          </Animated.View>
+          <View style={styles.scrollSpacer} />
+        </ScrollView>
+        <MatchActions onInterested={() => swipe('right')} onSkip={() => swipe('left')} />
       </View>
+
+      <MatchMoreMenu
+        category={currentActivity.category}
+        onClose={() => setSheet(null)}
+        onHide={skipCurrent}
+        onNotInterested={() => setSheet('notInterested')}
+        onReport={() => setSheet('report')}
+        onSafety={() => setSheet('safety')}
+        visible={sheet === 'more'}
+      />
+      <ReportActivitySheet onClose={() => setSheet(null)} visible={sheet === 'report'} />
+      <SafetySheet onClose={() => setSheet(null)} visible={sheet === 'safety'} />
+      <UndoSheet onCancel={() => setSheet(null)} onConfirm={undoSkip} visible={sheet === 'undo'} />
+      <NotInterestedSheet category={currentActivity.category} onCancel={() => setSheet(null)} onConfirm={skipCurrent} visible={sheet === 'notInterested'} />
     </SafeAreaView>
   );
 }
 
-function DiscoveryHeader({ onBack, onFilter }: { onBack: () => void; onFilter: () => void }) {
-  return (
-    <View style={styles.discoveryHeader}>
-      <View style={styles.headerLeft}>
-        <Pressable accessibilityLabel="Quay lại" onPress={onBack} style={styles.headerButton}><Ionicons color={colors.ink} name="arrow-back" size={21} /></Pressable>
-        <Pressable accessibilityLabel="Mở bộ lọc" onPress={onFilter} style={styles.headerButton}><Ionicons color={colors.ink} name="options-outline" size={21} /></Pressable>
-      </View>
-      <Text style={styles.headerTitle}>GoMate Match</Text>
-      <View style={styles.headerSpacer} />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  safeArea: { backgroundColor: '#FFFFFF', flex: 1 },
-  page: { alignSelf: 'center', flex: 1 },
-  discoveryHeader: { alignItems: 'center', flexDirection: 'row', height: 58, paddingHorizontal: 12 },
-  headerLeft: { flexDirection: 'row', gap: 7, width: 90 },
-  headerButton: { alignItems: 'center', backgroundColor: '#F4F5F9', borderColor: '#E9EBF1', borderRadius: 14, borderWidth: 1, height: 40, justifyContent: 'center', width: 40 },
-  headerTitle: { color: colors.ink, flex: 1, fontSize: 16, fontWeight: '900', textAlign: 'center' },
-  headerSpacer: { width: 90 },
-  counterOverlay: { backgroundColor: 'rgba(14,24,45,0.65)', borderRadius: 13, paddingHorizontal: 10, paddingVertical: 7, position: 'absolute', right: 16, top: 16 },
-  counterText: { color: '#FFFFFF', fontSize: 11, fontWeight: '800' },
-  deck: { flex: 1, overflow: 'hidden', position: 'relative' },
-  nextCard: { opacity: 0.45, position: 'absolute', width: '100%' },
-  currentCard: { height: '100%', position: 'absolute', width: '100%' },
-  swipeBadge: { backgroundColor: 'rgba(255,255,255,0.94)', borderRadius: 12, paddingHorizontal: 13, paddingVertical: 8, position: 'absolute', top: 28 },
-  skipBadge: { left: 22, transform: [{ rotate: '-9deg' }] },
-  likeBadge: { right: 22, transform: [{ rotate: '9deg' }] },
-  skipBadgeText: { color: '#F04D69', fontSize: 17, fontWeight: '900' },
-  likeBadgeText: { color: '#4D6CF4', fontSize: 17, fontWeight: '900' },
-  actions: { alignItems: 'center', bottom: 18, flexDirection: 'row', gap: 34, justifyContent: 'center', left: 0, position: 'absolute', right: 0 },
-  skipAction: { alignItems: 'center', backgroundColor: '#FFFFFF', borderColor: '#EBEDF3', borderRadius: 28, borderWidth: 1, height: 56, justifyContent: 'center', shadowColor: '#273A5D', shadowOffset: { width: 0, height: 7 }, shadowOpacity: 0.1, shadowRadius: 15, width: 56, elevation: 5 },
-  likeActionShadow: { borderRadius: 34, elevation: 8, shadowColor: '#555BEE', shadowOffset: { width: 0, height: 9 }, shadowOpacity: 0.27, shadowRadius: 15 },
-  likeAction: { alignItems: 'center', borderRadius: 31, height: 62, justifyContent: 'center', width: 62 },
-  pressed: { opacity: 0.72, transform: [{ scale: 0.96 }] },
-  emptyState: { alignItems: 'center', flex: 1, justifyContent: 'center', paddingBottom: 80, paddingHorizontal: 28 },
-  emptyIcon: { alignItems: 'center', backgroundColor: '#EFEEFF', borderRadius: 27, height: 64, justifyContent: 'center', width: 64 },
-  emptyTitle: { color: colors.ink, fontSize: 20, fontWeight: '900', marginTop: 20, textAlign: 'center' },
-  emptyText: { color: colors.body, fontSize: 13, lineHeight: 20, marginTop: 8, maxWidth: 310, textAlign: 'center' },
-  emptyButton: { alignItems: 'center', backgroundColor: '#5E5CEB', borderRadius: 17, flexDirection: 'row', gap: 8, marginTop: 22, paddingHorizontal: 18, paddingVertical: 13 },
-  emptyButtonText: { color: '#FFFFFF', fontSize: 13, fontWeight: '900' },
+  safeArea: { backgroundColor: colors.background, flex: 1 },
+  page: { alignSelf: 'center', flex: 1, maxWidth: layout.maxWidth, width: '100%' },
+  scrollContent: { paddingHorizontal: 14 },
+  scrollSpacer: { height: 12 },
 });
