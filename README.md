@@ -1,35 +1,40 @@
-﻿# GoMate Frontend
+# GoMate Mobile
 
-Ứng dụng React (JavaScript), sử dụng Node.js/npm để chạy Vite và build frontend.
+Ứng dụng kết nối hoạt động được xây dựng bằng React Native, Expo SDK 57 và
+TypeScript. Luồng hiện tại gồm đăng nhập/đăng ký, hoàn thiện hồ sơ và khu vực
+ứng dụng chính với năm tab: Trang chủ, Match, Tạo, Tin nhắn và Hồ sơ.
 
-## Chạy trên máy
+Tab Match là trung tâm tìm và quản lý hoạt động: mở chế độ khám phá toàn màn hình,
+xem lại yêu cầu đang chờ duyệt, hoặc quản lý hoạt động đã đăng và duyệt thành
+viên. Trong chế độ khám phá, người dùng có thể vuốt ngang để bỏ qua/tham gia,
+cuộn dọc để đọc thêm và mở profile host hoặc từng thành viên.
 
-Yêu cầu Node.js 22.12+ thuộc nhánh 22 hoặc Node.js 24+. Đã khởi tạo với Node.js 22.23.1 và npm 10.9.8.
+## Chạy dự án
 
 ```powershell
-cd C:\GoMate\GoMate-FE
 npm.cmd install
-npm.cmd run dev
+npm.cmd start
 ```
 
-Mở địa chỉ Vite hiển thị trong terminal, mặc định http://localhost:5173.
-Trên PowerShell, dùng `npm.cmd` nếu chính sách thực thi chặn `npm.ps1`.
+Quét QR bằng Expo Go hoặc nhấn `a` để mở Android emulator. Trên PowerShell, dùng
+`npm.cmd` nếu chính sách thực thi chặn `npm.ps1`.
 
-## Các lệnh
+## Kiểm tra
 
-- `npm.cmd run dev`: chạy development server, tự cập nhật khi sửa mã.
-- `npm.cmd run build`: build production vào thư mục `dist`.
-- `npm.cmd run preview`: xem thử bản build trên máy.
-- `npm.cmd run lint`: kiểm tra mã bằng Oxlint.
-- `npm.cmd ci`: cài đúng phiên bản theo package-lock.json.
+- `npm.cmd run typecheck`: kiểm tra TypeScript.
+- `npm.cmd run lint`: kiểm tra mã bằng Expo ESLint.
+- `npx.cmd expo-doctor`: kiểm tra cấu hình và dependency Expo.
+- `npx.cmd expo export --platform android --output-dir dist`: tạo Android bundle.
 
-## Cấu trúc
+## Cấu trúc chính
 
-- `src/main.jsx`: điểm khởi chạy React.
-- `src/App.jsx`: giao diện mẫu, thay nội dung tại đây để phát triển GoMate.
-- `src/App.css`, `src/index.css`: CSS giao diện.
-- `public/`: tài nguyên tĩnh.
-- `vite.config.js`: cấu hình Vite và plugin React.
+- `App.tsx`: điều phối xác thực, onboarding và ứng dụng chính.
+- `src/screens/`: toàn bộ màn hình auth, profile, dashboard, Match, bộ lọc,
+  tạo hoạt động, tin nhắn và các luồng phụ.
+- `src/components/`: header, bottom navigation, activity card và UI dùng lại.
+- `src/data/activities.ts`: dữ liệu activity mẫu cho Match.
+- `src/assets/Activity-image/`: bốn ảnh hoạt động do dự án cung cấp.
+- `docs/`: nhật ký phát triển và quyết định sản phẩm/kỹ thuật.
 
-Node.js trong thư mục này phục vụ công cụ frontend. API backend sẽ được phát triển riêng trong `GoMate-BE`.
-Không đặt mật khẩu hoặc khóa bí mật trong biến môi trường có tiền tố `VITE_`, vì chúng được đưa vào mã trình duyệt.
+Hiện dữ liệu và điều hướng được giữ cục bộ để hoàn thiện prototype UI. Backend,
+xác thực thật, upload và lưu trữ lâu dài chưa được kết nối.
