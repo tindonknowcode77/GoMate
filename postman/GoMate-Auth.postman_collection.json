@@ -1,0 +1,428 @@
+{
+  "info": {
+    "name": "GoMate - Backend Auth",
+    "description": "Chạy từng request bằng Send: Health → Register → mở email → điền verificationCode trong Variables → Verify Email → Login → Me → Logout. Sửa email thành hộp thư thật của bạn trước khi đăng ký. Register dừng Collection Runner để bạn nhập mã thủ công. Resend và Google Login chỉ chạy khi cần, không phải bước bắt buộc. SMTP cần cấu hình ở BE; không nhập App Password vào Postman.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:3000",
+      "type": "string",
+      "description": "Địa chỉ BE, không có dấu / cuối."
+    },
+    {
+      "key": "name",
+      "value": "GoMate Test",
+      "type": "string",
+      "description": "Tên tài khoản đăng ký."
+    },
+    {
+      "key": "email",
+      "value": "gomate-test@example.com",
+      "type": "string",
+      "description": "Thay bằng email thật bạn có thể nhận thư."
+    },
+    {
+      "key": "password",
+      "value": "GoMate@Test123456",
+      "type": "string",
+      "description": "Mật khẩu 12–128 ký tự."
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string",
+      "description": "Tự lưu từ Login/Google Login."
+    },
+    {
+      "key": "googleIdToken",
+      "value": "",
+      "type": "string",
+      "description": "ID token thật từ Google; không phải accessToken GoMate."
+    },
+    {
+      "key": "verificationCode",
+      "value": "",
+      "type": "string",
+      "description": "Mã 6 số nhận qua email; giữ dạng chuỗi để không mất số 0 đầu."
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        },
+        "description": "Kiểm tra BE đang chạy."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "02 - Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"{{name}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Điền name, email thật và password trong Variables. Gửi đăng ký, mở hộp thư nhận mã. SMTP phải được cấu hình trong BE. 201: đã gửi mã; 409: email đã tồn tại; 503: chưa cấu hình hoặc gửi email thất bại."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) {",
+              "  pm.test('Email verification required', () => pm.expect(pm.response.json().verificationRequired).to.eql(true));",
+              "  pm.collectionVariables.set('verificationCode', '');",
+              "  pm.collectionVariables.set('accessToken', '');",
+              "  pm.execution.setNextRequest(null);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "03 - Verify Email",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/verify-email",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "verify-email"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"code\": \"{{verificationCode}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Nhập mã 6 số từ email vào biến verificationCode rồi Send. Mã có hiệu lực 10 phút, tối đa 5 lần nhập và chỉ dùng một lần. 200: xác minh thành công; 400: mã sai, hết hạn hoặc hết lượt."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) pm.collectionVariables.set('verificationCode', '');"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "04 - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Chỉ đăng nhập sau khi xác minh email. 200: tự lưu accessToken; 403: cần xác minh email; 401: sai thông tin đăng nhập."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('accessToken', '');",
+              "if (pm.response.code === 200) {",
+              "  const data = pm.response.json();",
+              "  pm.test('Access token returned', () => pm.expect(data.accessToken).to.be.a('string').and.not.empty);",
+              "  if (typeof data.accessToken === 'string') pm.collectionVariables.set('accessToken', data.accessToken);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "05 - Me",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "me"
+          ]
+        },
+        "description": "Dùng accessToken được tự lưu sau Login hoặc Google Login."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "06 - Logout",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "logout"
+          ]
+        },
+        "description": "Thu hồi phiên hiện tại và xóa accessToken trong collection khi thành công."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 204', () => pm.response.to.have.status(204));",
+              "if (pm.response.code === 204) pm.collectionVariables.set('accessToken', '');"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "07 - Resend Verification Code (khi cần)",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/resend-verification",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "resend-verification"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Dùng khi chưa nhận được mã hoặc mã hết hạn. Chờ tối thiểu 60 giây giữa các lần gửi; mã mới thay thế mã cũ. Nhập mã mới vào verificationCode rồi chạy Verify Email. HTTP 200 là thông báo chung, không bảo đảm email được gửi nếu tài khoản không cần xác minh hoặc còn thời gian chờ."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "08 - Google Login (luồng riêng)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/google",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "google"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idToken\": \"{{googleIdToken}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "description": "Điền googleIdToken thật được cấp cho GOOGLE_CLIENT_ID của BE. Tự lưu token GoMate sau khi thành công. Không cần mã email riêng."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('accessToken', '');",
+              "if (pm.response.code === 200) {",
+              "  const data = pm.response.json();",
+              "  pm.test('Access token returned', () => pm.expect(data.accessToken).to.be.a('string').and.not.empty);",
+              "  if (typeof data.accessToken === 'string') pm.collectionVariables.set('accessToken', data.accessToken);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}
